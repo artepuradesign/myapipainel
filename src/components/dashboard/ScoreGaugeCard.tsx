@@ -38,6 +38,10 @@
    
    // Ângulo para o ponteiro (de -90 a 90 graus)
    const needleAngle = -90 + (percentage * 1.8);
+
+  const needleStrokeWidth = compact ? 2 : 3;
+  const needleY2 = compact ? 48 : 40;
+  const needleCenterRadius = compact ? 4 : 5;
    
    const IconComponent = icon === 'trending' ? TrendingUp : BarChart3;
 
@@ -118,12 +122,12 @@
                  x1="100"
                  y1="100"
                  x2="100"
-                 y2="40"
+                  y2={needleY2}
                 stroke="hsl(var(--muted-foreground))"
-                 strokeWidth="3"
+                  strokeWidth={needleStrokeWidth}
                  strokeLinecap="round"
                />
-              <circle cx="100" cy="100" r="5" fill="hsl(var(--muted-foreground))" />
+               <circle cx="100" cy="100" r={needleCenterRadius} fill="hsl(var(--muted-foreground))" />
              </g>
            </svg>
            
