@@ -1964,7 +1964,7 @@ Todos os direitos reservados.`;
   };
 
   return (
-    <div className="space-y-6 max-w-full overflow-x-hidden">
+    <div className="space-y-4 md:space-y-6 max-w-full overflow-x-hidden">
       <div className="w-full max-w-6xl mx-auto">
         <SimpleTitleBar
           title="Consulta CPF Simples"
@@ -1973,7 +1973,7 @@ Todos os direitos reservados.`;
           onBack={handleBack}
         />
 
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-4 md:gap-6 lg:gap-8">
+        <div className="mt-4 md:mt-6 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-4 md:gap-6 lg:gap-8">
         {/* Formulário de Consulta */}
         <Card className="dark:bg-gray-800 dark:border-gray-700 w-full">
           <CardHeader className="pb-4">
