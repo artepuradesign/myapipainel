@@ -79,6 +79,7 @@ import { atitoConsultaCpfService } from '@/services/atitoConsultaCpfService';
 import SectionActionButtons from '@/components/dashboard/SectionActionButtons';
 import PisSection from '@/components/dashboard/PisSection';
 import ScrollToTop from '@/components/ui/scroll-to-top';
+import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 
 // Função melhorada para consultar CPF e registrar com debug robusto
 const consultarCPFComRegistro = async (cpf: string, cost: number, metadata: any) => {
@@ -1952,10 +1953,27 @@ Todos os direitos reservados.`;
     );
   }
 
+  const handleBack = () => {
+    // Se o usuário chegou aqui via navegação interna, volta uma tela.
+    // Caso contrário (ex.: abriu direto a URL), volta para o dashboard.
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate('/dashboard');
+  };
+
   return (
-    <div className="space-y-6 max-w-full overflow-x-hidden">
+    <div className="space-y-4 md:space-y-6 max-w-full overflow-x-hidden">
       <div className="w-full max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-4 md:gap-6 lg:gap-8">
+        <SimpleTitleBar
+          title="Consulta CPF"
+          subtitle="Consulte dados do CPF na base de dados"
+          icon={<Search className="h-4 w-4 md:h-5 md:w-5" />}
+          onBack={handleBack}
+        />
+
+        <div className="mt-4 md:mt-6 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-4 md:gap-6 lg:gap-8">
         {/* Formulário de Consulta */}
         <Card className="dark:bg-gray-800 dark:border-gray-700 w-full">
           <CardHeader className="pb-4">
