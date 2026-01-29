@@ -87,6 +87,13 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 // Função melhorada para consultar CPF e registrar com debug robusto
 const consultarCPFComRegistro = async (cpf: string, cost: number, metadata: any) => {
@@ -722,50 +729,46 @@ const ConsultarCpfPuxaTudo = () => {
     };
   };
 
-  const RECENT_CONSULTATIONS_PAGE_SIZE = 10;
+  const [recentConsultationsPageSize, setRecentConsultationsPageSize] = useState<number>(5);
   const [recentConsultationsPage, setRecentConsultationsPage] = useState(1);
   const [recentConsultationsHasNext, setRecentConsultationsHasNext] = useState(false);
 
   // Carregar últimas consultas CPF para exibir na seção (paginado no backend)
-  const loadRecentConsultations = async (page: number = 1) => {
+  const loadRecentConsultations = async (page: number = 1, pageSize: number = recentConsultationsPageSize) => {
     if (!user) return;
     
     try {
       setRecentConsultationsLoading(true);
       console.log('📋 [RECENT_CONSULTATIONS] Carregando consultas CPF (paginado)...', {
         page,
-        limit: RECENT_CONSULTATIONS_PAGE_SIZE,
+        limit: pageSize,
       });
       
-      // Usar o endpoint do consultationApiService para manter consistência com /dashboard/historico
-      const offset = (page - 1) * RECENT_CONSULTATIONS_PAGE_SIZE;
-      const response = await consultationApiService.getConsultationHistory(
-        RECENT_CONSULTATIONS_PAGE_SIZE,
-        offset
-      );
-      
-      if (response.success && response.data && Array.isArray(response.data)) {
-        // Filtrar apenas consultas CPF e formatar para o ConsultationsSection
-        const cpfConsultations = response.data
-          .filter(item => item.module_type === 'cpf')
-          .map((consultation: any) => ({
-            id: `consultation-${consultation.id}`,
-            type: 'consultation',
-            module_type: 'cpf',
-            document: consultation.document,
-            cost: consultation.cost,
-            amount: -Math.abs(consultation.cost),
-            status: consultation.status,
-            created_at: consultation.created_at,
-            updated_at: consultation.updated_at,
-            description: `Consulta CPF ${consultation.document.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}`,
-            result_data: consultation.result_data
-          }));
-        
+      // IMPORTANTE: usar o endpoint específico de histórico CPF (evita páginas "vazias" ao filtrar
+      // module_type após paginar em um histórico misto de módulos).
+      const response = await consultasCpfHistoryService.getHistory(page, pageSize);
+
+      const payload = response.success ? response.data : undefined;
+      const list = payload?.data;
+
+      if (response.success && payload && Array.isArray(list)) {
+        const cpfConsultations = list.map((consultation: any) => ({
+          id: `consultation-${consultation.id}`,
+          type: 'consultation',
+          module_type: 'cpf',
+          document: consultation.document,
+          cost: consultation.cost,
+          amount: -Math.abs(Number(consultation.cost) || 0),
+          status: consultation.status,
+          created_at: consultation.created_at,
+          updated_at: consultation.updated_at,
+          description: `Consulta CPF ${(consultation.document || '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}`,
+          result_data: consultation.result_data,
+        }));
+
         setRecentConsultations(cpfConsultations);
         setRecentConsultationsPage(page);
-        // Como o endpoint não retorna total, inferimos o "hasNext" pelo tamanho da página
-        setRecentConsultationsHasNext(cpfConsultations.length === RECENT_CONSULTATIONS_PAGE_SIZE);
+        setRecentConsultationsHasNext(Boolean(payload.pagination?.has_next));
         console.log('✅ [RECENT_CONSULTATIONS] Últimas consultas carregadas:', cpfConsultations.length);
       } else {
         console.warn('⚠️ [RECENT_CONSULTATIONS] Nenhuma consulta encontrada');
@@ -3052,6 +3055,29 @@ Todos os direitos reservados.`;
               <FileText className={`mr-2 flex-shrink-0 ${isMobile ? 'h-4 w-4' : 'h-4 w-4 sm:h-5 sm:w-5'}`} />
               <span className="truncate">Últimas Consultas</span>
             </CardTitle>
+
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground whitespace-nowrap">Exibir</span>
+              <Select
+                value={String(recentConsultationsPageSize)}
+                onValueChange={(v) => {
+                  const nextSize = Number(v);
+                  setRecentConsultationsPageSize(nextSize);
+                  // resetar paginação ao mudar o tamanho da página
+                  loadRecentConsultations(1, nextSize);
+                }}
+              >
+                <SelectTrigger className="h-9 w-[92px]">
+                  <SelectValue placeholder="5" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="5">5</SelectItem>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                </SelectContent>
+              </Select>
+              <span className="text-sm text-muted-foreground whitespace-nowrap">por página</span>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -3213,7 +3239,7 @@ Todos os direitos reservados.`;
                            e.preventDefault();
                            if (recentConsultationsLoading) return;
                            if (recentConsultationsPage <= 1) return;
-                           loadRecentConsultations(recentConsultationsPage - 1);
+                            loadRecentConsultations(recentConsultationsPage - 1);
                          }}
                          aria-disabled={recentConsultationsPage <= 1 || recentConsultationsLoading}
                          className={
@@ -3242,7 +3268,7 @@ Todos os direitos reservados.`;
                            e.preventDefault();
                            if (recentConsultationsLoading) return;
                            if (!recentConsultationsHasNext) return;
-                           loadRecentConsultations(recentConsultationsPage + 1);
+                            loadRecentConsultations(recentConsultationsPage + 1);
                          }}
                          aria-disabled={!recentConsultationsHasNext || recentConsultationsLoading}
                          className={
@@ -3257,9 +3283,9 @@ Todos os direitos reservados.`;
                </div>
             </>
           ) : (
-            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <div className="text-center py-8 text-muted-foreground">
+              <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-foreground mb-2">
                 Nenhuma consulta encontrada
               </h3>
               <p className="text-sm">
