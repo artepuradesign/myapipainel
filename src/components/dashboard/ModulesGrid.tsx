@@ -136,9 +136,13 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ currentPlan, onModuleClick, p
             icon: module.icon || 'Package',
             // `api_endpoint` agora representa a rota interna da página do módulo (ex.: /dashboard/consultar-cpf-simples)
             api_endpoint: module.api_endpoint || module.path || '',
-            path: (module.api_endpoint || module.path || '').toString().trim().startsWith('/')
-              ? (module.api_endpoint || module.path || '').toString().trim()
-              : `/module/${module.slug}`,
+            path: (() => {
+              const raw = (module.api_endpoint || module.path || '').toString().trim();
+              if (!raw) return `/module/${module.slug}`;
+              if (raw.startsWith('/')) return raw;
+              if (raw.startsWith('dashboard/')) return `/${raw}`;
+              return `/module/${module.slug}`;
+            })(),
             operationalStatus: module.operational_status as 'on' | 'off' | 'manutencao',
             panelId: module.panel_id.toString(),
             color: module.color || '#6366f1',

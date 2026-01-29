@@ -63,8 +63,11 @@ const PainelIndividual = () => {
 
   const getModulePageRoute = (module: any): string => {
     // Agora o campo `api_endpoint` representa a rota interna da página do módulo (ex.: /dashboard/consultar-cpf-simples)
-    const route = (module?.api_endpoint || module?.path || '').toString().trim();
-    if (route.startsWith('/')) return route;
+    const raw = (module?.api_endpoint || module?.path || '').toString().trim();
+    if (!raw) return `/module/${module.slug}`;
+    if (raw.startsWith('/')) return raw;
+    // Normaliza rotas internas digitadas sem a barra inicial
+    if (raw.startsWith('dashboard/')) return `/${raw}`;
     // Fallback legado
     return `/module/${module.slug}`;
   };

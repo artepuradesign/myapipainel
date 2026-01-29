@@ -43,13 +43,18 @@ export const loadPanelMenusFromApi = async (): Promise<SidebarItem[]> => {
       const subItems = panelModules.map(module => {
         const ModuleIconComponent = (Icons as any)[module.icon] || Icons.Package;
 
-         const moduleRoute = (module.api_endpoint || module.path || '').toString().trim();
+         const moduleRouteRaw = (module.api_endpoint || module.path || '').toString().trim();
+         const moduleRoute = moduleRouteRaw.startsWith('/')
+           ? moduleRouteRaw
+           : moduleRouteRaw.startsWith('dashboard/')
+             ? `/${moduleRouteRaw}`
+             : '';
         
         return {
           icon: ModuleIconComponent,
           label: module.title,
            // `api_endpoint` agora representa a rota interna da página do módulo (ex.: /dashboard/consultar-cpf-simples)
-           path: moduleRoute.startsWith('/') ? moduleRoute : `/module/${module.slug}`,
+           path: moduleRoute || `/module/${module.slug}`,
           description: module.description,
           price: module.price ? module.price.toString() : '0'
         };
