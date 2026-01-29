@@ -58,7 +58,9 @@ const ApiModuleEditForm = ({ module, panels, onSubmit, onCancel }: ApiModuleEdit
         operational_status: module.operational_status || 'on',
         is_active: Boolean(module.is_active),
         is_premium: Boolean(module.is_premium),
-        api_endpoint: module.api_endpoint || '',
+        // Neste sistema, o campo API Endpoint é usado como o link/rota interna da página do módulo
+        // (ex.: /dashboard/consultar-cpf-simples). Se vier vazio, aproveita o `path` legado.
+        api_endpoint: module.api_endpoint || module.path || '',
         api_method: (module.api_method as 'GET' | 'POST' | 'PUT' | 'DELETE') || 'POST',
         sort_order: module.sort_order || 0,
         settings: typeof module.settings === 'object' ? JSON.stringify(module.settings) : (module.settings || '{}')
@@ -311,14 +313,17 @@ const ApiModuleEditForm = ({ module, panels, onSubmit, onCancel }: ApiModuleEdit
             {/* API Endpoint e Método */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="api_endpoint">API Endpoint</Label>
+                 <Label htmlFor="api_endpoint">Link da página do módulo</Label>
                 <Input
                   id="api_endpoint"
                   value={formData.api_endpoint}
                   onChange={(e) => handleChange('api_endpoint', e.target.value)}
-                  placeholder="/api/endpoint"
+                   placeholder="/dashboard/consultar-cpf-simples"
                   disabled={isSubmitting}
                 />
+                 <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                   Use uma rota interna do sistema (começando com <span className="font-mono">/dashboard/</span>).
+                 </p>
               </div>
 
               <div>

@@ -322,14 +322,17 @@ const ApiModuleForm = ({ module, panels, onSubmit, onCancel }: ApiModuleFormProp
             {/* Linha 5: API Endpoint e Método */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="w-full">
-                <Label htmlFor="api_endpoint">API Endpoint</Label>
+                <Label htmlFor="api_endpoint">Link da página do módulo</Label>
                 <Input
                   id="api_endpoint"
                   value={formData.api_endpoint}
                   onChange={(e) => handleChange('api_endpoint', e.target.value)}
-                  placeholder="https://api.exemplo.com/endpoint"
+                  placeholder="/dashboard/consultar-cpf-simples"
                   className="w-full"
                 />
+                <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  Informe a rota interna do módulo (ex.: <span className="font-mono">/dashboard/consultar-cpf-puxa-tudo</span>).
+                </p>
               </div>
 
               <div className="w-full">
