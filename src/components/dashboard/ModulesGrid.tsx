@@ -141,6 +141,7 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ currentPlan, onModuleClick, p
               if (!raw) return `/module/${module.slug}`;
               if (raw.startsWith('/')) return raw;
               if (raw.startsWith('dashboard/')) return `/${raw}`;
+              if (!raw.includes('/')) return `/dashboard/${raw}`;
               return `/module/${module.slug}`;
             })(),
             operationalStatus: module.operational_status as 'on' | 'off' | 'manutencao',

@@ -109,6 +109,8 @@ const PanelsGrid: React.FC<PanelsGridProps> = ({ activePanels }) => {
     if (raw.startsWith('/')) return raw;
     // Normaliza rotas internas digitadas sem a barra inicial
     if (raw.startsWith('dashboard/')) return `/${raw}`;
+    // Se vier apenas o "slug" (ex.: consultar-cpf-simples), assume rota interna em /dashboard/
+    if (!raw.includes('/')) return `/dashboard/${raw}`;
     // Fallback legado
     return `/module/${module.slug}`;
   };
