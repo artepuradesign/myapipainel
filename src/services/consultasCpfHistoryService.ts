@@ -62,6 +62,13 @@ function getHeaders(): HeadersInit {
 }
 
 export const consultasCpfHistoryService = {
+  // Considera CPF quando `module_type` for o legado ('cpf') OU quando for um título contendo 'cpf'
+  // (ex.: "Consultar CPF (Simples)")
+  isCpfConsultation(item: any): boolean {
+    const mt = (item?.module_type || '').toString().toLowerCase();
+    return mt === 'cpf' || mt.includes('cpf');
+  },
+
   // Buscar histórico de consultas CPF (ambas tabelas) - usa endpoint correto
   async getHistory(page: number = 1, limit: number = 50): Promise<ApiResponse<ConsultaCpfHistoryResponse>> {
     console.log('📋 [CPF_HISTORY_API] Buscando histórico de consultas CPF');
@@ -79,7 +86,7 @@ export const consultasCpfHistoryService = {
     
     // Transformar resposta no formato esperado
     if (response.success && Array.isArray(response.data)) {
-      const cpfConsultations = response.data.filter((c: any) => c.module_type === 'cpf');
+      const cpfConsultations = response.data.filter((c: any) => this.isCpfConsultation(c));
       const total = cpfConsultations.length;
       
       return {
@@ -148,7 +155,7 @@ export const consultasCpfHistoryService = {
         };
       }
       
-      const consultas = response.data.filter((c: any) => c.module_type === 'cpf');
+      const consultas = response.data.filter((c: any) => this.isCpfConsultation(c));
       const today = new Date().toDateString();
       const thisMonth = new Date().getMonth();
       const thisYear = new Date().getFullYear();
