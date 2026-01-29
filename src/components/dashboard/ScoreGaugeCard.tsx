@@ -8,6 +8,7 @@
    faixa: string | null;
    maxScore?: number;
    icon?: 'chart' | 'trending';
+  compact?: boolean;
  }
  
  const ScoreGaugeCard: React.FC<ScoreGaugeCardProps> = ({ 
@@ -15,7 +16,8 @@
    score, 
    faixa, 
    maxScore = 1000,
-   icon = 'chart'
+    icon = 'chart',
+    compact = false
  }) => {
    // Converter score para número
    const numericScore = typeof score === 'string' ? parseFloat(score) : (score || 0);
@@ -34,23 +36,36 @@
    const needleAngle = -90 + (percentage * 1.8);
    
    const IconComponent = icon === 'trending' ? TrendingUp : BarChart3;
+
+    const ui = {
+      outerPadding: compact ? 'p-4' : 'p-6',
+      headerGap: compact ? 'gap-2 mb-2' : 'gap-2 mb-4',
+      iconSize: compact ? 'h-4 w-4' : 'h-5 w-5',
+      titleText: compact
+        ? 'text-xs font-semibold uppercase tracking-wider text-foreground'
+        : 'text-sm font-semibold uppercase tracking-wider text-foreground',
+      gaugeWrap: compact
+        ? 'bg-background border border-border rounded-lg p-3 mb-3 relative'
+        : 'bg-background border border-border rounded-lg p-6 mb-4 relative',
+      scoreText: compact ? 'text-2xl font-bold text-foreground' : 'text-3xl font-bold text-foreground',
+      scoreSubText: compact ? 'text-[10px] text-muted-foreground font-medium' : 'text-xs text-muted-foreground font-medium',
+      infoLabel: compact ? 'text-[10px]' : 'text-xs',
+      infoValue: compact ? 'text-xs' : 'text-sm',
+    };
    
    return (
     <Card className="bg-card text-card-foreground border-border overflow-hidden">
-       <div className="p-6">
+        <div className={ui.outerPadding}>
          {/* Header */}
-         <div className="flex items-center gap-2 mb-4">
-           <IconComponent className={`h-5 w-5 ${colors.text}`} />
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
+          <div className={`flex items-center ${ui.headerGap}`}>
+            <IconComponent className={`${ui.iconSize} ${colors.text}`} />
+           <h3 className={ui.titleText}>
              {title}
            </h3>
          </div>
          
          {/* Gauge Chart */}
-        <div
-          className="bg-background border border-border rounded-lg p-6 mb-4 relative"
-          style={{ aspectRatio: '1/1' }}
-        >
+         <div className={ui.gaugeWrap} style={{ aspectRatio: '1/1' }}>
            <svg viewBox="0 0 200 120" className="w-full h-auto">
              {/* Background arcs */}
              <path
@@ -105,10 +120,10 @@
            
            {/* Score Display */}
            <div className="absolute inset-0 flex flex-col items-center justify-end pb-4">
-            <div className="text-3xl font-bold text-foreground">
+             <div className={ui.scoreText}>
                {Math.round(numericScore)}
              </div>
-            <div className="text-xs text-muted-foreground font-medium">
+             <div className={ui.scoreSubText}>
                /{maxScore}
              </div>
            </div>
@@ -117,14 +132,14 @@
          {/* Score Info */}
          <div className="space-y-1">
            <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-xs uppercase">Pontuação:</span>
-             <span className={`font-bold text-sm ${colors.text}`}>
+             <span className={`text-muted-foreground uppercase ${ui.infoLabel}`}>Pontuação:</span>
+              <span className={`font-bold ${ui.infoValue} ${colors.text}`}>
                {Math.round(numericScore)}
              </span>
            </div>
            <div className="flex items-center gap-2">
-            <span className="text-muted-foreground text-xs uppercase">Faixa:</span>
-             <span className={`font-semibold text-sm ${colors.text} uppercase`}>
+             <span className={`text-muted-foreground uppercase ${ui.infoLabel}`}>Faixa:</span>
+              <span className={`font-semibold ${ui.infoValue} ${colors.text} uppercase`}>
                {faixa || 'N/A'}
              </span>
            </div>
