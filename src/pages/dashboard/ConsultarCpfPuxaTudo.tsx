@@ -2334,10 +2334,10 @@ Todos os direitos reservados.`;
             <FotosSection cpfId={result.id} cpfNumber={result.cpf} onCountChange={setFotosCount} />
           </div>
 
-           {/* Score + CSB8 + CSBA (3 colunas no desktop, compactos) */}
-           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+           {/* Score + CSB8 + CSBA (responsivo e compacto) */}
+           <div className="mx-auto w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
              <Card id="score-section" className={onlineCardClass(hasValue(result.score))}>
-               <CardHeader className="p-4 pb-2">
+                <CardHeader className="p-3 pb-2">
                  <div className="flex items-center justify-between">
                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                      <TrendingUp className="h-4 w-4" />
@@ -2366,8 +2366,8 @@ Todos os direitos reservados.`;
                    </div>
                  </div>
                </CardHeader>
-               <CardContent className="p-4 pt-0 space-y-2">
-                 <ScoreGaugeCard title="SCORE" score={result.score} faixa={scoreData.label} icon="chart" />
+                <CardContent className="p-3 pt-0 space-y-2">
+                  <ScoreGaugeCard title="SCORE" score={result.score} faixa={scoreData.label} icon="chart" compact />
                   {scoreData.description !== 'Score baixo, precisa de atenção' && (
                     <p className="text-xs text-muted-foreground">{scoreData.description}</p>
                   )}
@@ -2375,7 +2375,7 @@ Todos os direitos reservados.`;
              </Card>
 
              <Card id="csb8-section" className={onlineCardClass(hasValue(result.csb8) || hasValue(result.csb8_faixa))}>
-               <CardHeader className="p-4 pb-2">
+                <CardHeader className="p-3 pb-2">
                  <div className="flex items-center justify-between">
                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                      <TrendingUp className="h-4 w-4" />
@@ -2404,13 +2404,13 @@ Todos os direitos reservados.`;
                    </div>
                  </div>
                </CardHeader>
-               <CardContent className="p-4 pt-0">
-                 <ScoreGaugeCard title="CSB8 [SCORE]" score={result.csb8} faixa={result.csb8_faixa} icon="chart" />
+                <CardContent className="p-3 pt-0">
+                  <ScoreGaugeCard title="CSB8 [SCORE]" score={result.csb8} faixa={result.csb8_faixa} icon="chart" compact />
                </CardContent>
              </Card>
 
              <Card id="csba-section" className={onlineCardClass(hasValue(result.csba) || hasValue(result.csba_faixa))}>
-               <CardHeader className="p-4 pb-2">
+                <CardHeader className="p-3 pb-2">
                  <div className="flex items-center justify-between">
                    <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
                      <TrendingUp className="h-4 w-4" />
@@ -2439,8 +2439,8 @@ Todos os direitos reservados.`;
                    </div>
                  </div>
                </CardHeader>
-               <CardContent className="p-4 pt-0">
-                 <ScoreGaugeCard title="CSBA [SCORE]" score={result.csba} faixa={result.csba_faixa} icon="trending" />
+                <CardContent className="p-3 pt-0">
+                  <ScoreGaugeCard title="CSBA [SCORE]" score={result.csba} faixa={result.csba_faixa} icon="trending" compact />
                </CardContent>
              </Card>
            </div>

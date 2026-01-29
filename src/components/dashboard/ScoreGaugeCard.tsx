@@ -8,6 +8,7 @@
    faixa: string | null;
    maxScore?: number;
    icon?: 'chart' | 'trending';
+  compact?: boolean;
  }
  
  const ScoreGaugeCard: React.FC<ScoreGaugeCardProps> = ({ 
@@ -15,7 +16,8 @@
    score, 
    faixa, 
    maxScore = 1000,
-   icon = 'chart'
+  icon = 'chart',
+  compact = false
  }) => {
    // Converter score para número
    const numericScore = typeof score === 'string' ? parseFloat(score) : (score || 0);
@@ -34,13 +36,20 @@
    const needleAngle = -90 + (percentage * 1.8);
    
    const IconComponent = icon === 'trending' ? TrendingUp : BarChart3;
+
+  const pad = compact ? 'p-4' : 'p-6';
+  const gaugePad = compact ? 'p-4' : 'p-6';
+  const headerGap = compact ? 'mb-3' : 'mb-4';
+  const iconSize = compact ? 'h-4 w-4' : 'h-5 w-5';
+  const scoreSize = compact ? 'text-2xl' : 'text-3xl';
+  const scoreInfoSize = compact ? 'text-xs' : 'text-sm';
    
    return (
     <Card className="bg-card text-card-foreground border-border overflow-hidden">
-       <div className="p-6">
+      <div className={pad}>
          {/* Header */}
-         <div className="flex items-center gap-2 mb-4">
-           <IconComponent className={`h-5 w-5 ${colors.text}`} />
+        <div className={`flex items-center gap-2 ${headerGap}`}>
+          <IconComponent className={`${iconSize} ${colors.text}`} />
           <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
              {title}
            </h3>
@@ -48,7 +57,7 @@
          
          {/* Gauge Chart */}
         <div
-          className="bg-background border border-border rounded-lg p-6 mb-4 relative"
+          className={`bg-background border border-border rounded-lg ${gaugePad} mb-4 relative`}
           style={{ aspectRatio: '1/1' }}
         >
            <svg viewBox="0 0 200 120" className="w-full h-auto">
@@ -105,7 +114,7 @@
            
            {/* Score Display */}
            <div className="absolute inset-0 flex flex-col items-center justify-end pb-4">
-            <div className="text-3xl font-bold text-foreground">
+            <div className={`${scoreSize} font-bold text-foreground`}>
                {Math.round(numericScore)}
              </div>
             <div className="text-xs text-muted-foreground font-medium">
@@ -118,13 +127,13 @@
          <div className="space-y-1">
            <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-xs uppercase">Pontuação:</span>
-             <span className={`font-bold text-sm ${colors.text}`}>
+            <span className={`font-bold ${scoreInfoSize} ${colors.text}`}>
                {Math.round(numericScore)}
              </span>
            </div>
            <div className="flex items-center gap-2">
             <span className="text-muted-foreground text-xs uppercase">Faixa:</span>
-             <span className={`font-semibold text-sm ${colors.text} uppercase`}>
+            <span className={`font-semibold ${scoreInfoSize} ${colors.text} uppercase`}>
                {faixa || 'N/A'}
              </span>
            </div>
