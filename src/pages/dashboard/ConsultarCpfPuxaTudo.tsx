@@ -2336,43 +2336,42 @@ Todos os direitos reservados.`;
 
            {/* Score + CSB8 + CSBA (responsivo e compacto) */}
            <div className="mx-auto w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
-             <Card id="score-section" className={onlineCardClass(hasValue(result.score))}>
-                <CardHeader className="p-3 pb-2">
-                 <div className="flex items-center justify-between">
-                   <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                     <TrendingUp className="h-4 w-4" />
-                     Score
-                   </CardTitle>
-                   <div className="flex items-center gap-2">
-                     <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
-                       Online
-                     </Badge>
-                     <Button
-                       variant="ghost"
-                       size="icon"
-                       onClick={() => {
-                         const dados = [
-                           `SCORE: ${result.score || '-'}`,
-                           `FAIXA: ${scoreData.label || '-'}`,
-                         ].join('\n');
-                         navigator.clipboard.writeText(dados);
-                         toast.success('Score copiado!');
-                       }}
-                       className="h-8 w-8"
-                       title="Copiar dados da seção"
-                     >
-                       <Copy className="h-4 w-4" />
-                     </Button>
+             {Number(result.score) > 0 && (
+               <Card id="score-section" className={onlineCardClass(hasValue(result.score))}>
+                 <CardHeader className="p-3 pb-2">
+                   <div className="flex items-center justify-between">
+                     <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                       <TrendingUp className="h-4 w-4" />
+                       Score
+                     </CardTitle>
+                     <div className="flex items-center gap-2">
+                       <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                         Online
+                       </Badge>
+                       <Button
+                         variant="ghost"
+                         size="icon"
+                         onClick={() => {
+                           const dados = [`SCORE: ${result.score || '-'}`, `FAIXA: ${scoreData.label || '-'}`].join('\n');
+                           navigator.clipboard.writeText(dados);
+                           toast.success('Score copiado!');
+                         }}
+                         className="h-8 w-8"
+                         title="Copiar dados da seção"
+                       >
+                         <Copy className="h-4 w-4" />
+                       </Button>
+                     </div>
                    </div>
-                 </div>
-               </CardHeader>
-                <CardContent className="p-3 pt-0 space-y-2">
-                  <ScoreGaugeCard title="SCORE" score={result.score} faixa={scoreData.label} icon="chart" compact />
-                  {scoreData.description !== 'Score baixo, precisa de atenção' && (
-                    <p className="text-xs text-muted-foreground">{scoreData.description}</p>
-                  )}
-               </CardContent>
-             </Card>
+                 </CardHeader>
+                 <CardContent className="p-3 pt-0 space-y-2">
+                   <ScoreGaugeCard title="SCORE" score={result.score} faixa={scoreData.label} icon="chart" compact />
+                   {scoreData.description !== 'Score baixo, precisa de atenção' && (
+                     <p className="text-xs text-muted-foreground">{scoreData.description}</p>
+                   )}
+                 </CardContent>
+               </Card>
+             )}
 
              <Card id="csb8-section" className={onlineCardClass(hasValue(result.csb8) || hasValue(result.csb8_faixa))}>
                 <CardHeader className="p-3 pb-2">
