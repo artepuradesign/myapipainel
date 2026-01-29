@@ -7,6 +7,7 @@ import { baseFotoService, BaseFoto } from '@/services/baseFotoService';
 import { toast } from 'sonner';
 import placeholderImage from '@/assets/placeholder-photo.png';
 import PhotoZoomOverlay from '@/components/ui/PhotoZoomOverlay';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface FotosSectionProps {
   cpfId: number;
@@ -17,8 +18,11 @@ interface FotosSectionProps {
 const FotosSection: React.FC<FotosSectionProps> = ({ cpfId, cpfNumber, onCountChange }) => {
   const [fotos, setFotos] = useState<BaseFoto[]>([]);
   const [loading, setLoading] = useState(true);
+  const isMobile = useIsMobile();
 
   const DESKTOP_SLOTS = 4;
+  const MOBILE_SLOTS = fotos.length > 2 ? 4 : 2;
+  const slotsToRender = isMobile ? MOBILE_SLOTS : DESKTOP_SLOTS;
 
   const hasData = fotos.length > 0;
   const sectionCardClass = hasData ? "border-success-border bg-success-subtle" : undefined;
@@ -265,11 +269,11 @@ const FotosSection: React.FC<FotosSectionProps> = ({ cpfId, cpfNumber, onCountCh
         {fotos.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {(() => {
-              const placeholdersToAdd = Math.max(0, DESKTOP_SLOTS - fotos.length);
+              const placeholdersToAdd = Math.max(0, slotsToRender - fotos.length);
 
               return (
                 <>
-                  {fotos.map((foto, index) => renderRealPhotoCard(foto, index))}
+                  {fotos.slice(0, slotsToRender).map((foto, index) => renderRealPhotoCard(foto, index))}
                   {Array.from({ length: placeholdersToAdd }).map((_, i) =>
                     renderPlaceholderCard(fotos.length + i)
                   )}
@@ -280,7 +284,7 @@ const FotosSection: React.FC<FotosSectionProps> = ({ cpfId, cpfNumber, onCountCh
         ) : (
           <div className="space-y-3">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {Array.from({ length: 4 }).map((_, index) => (
+              {Array.from({ length: slotsToRender }).map((_, index) => (
                 renderPlaceholderCard(index)
               ))}
             </div>
