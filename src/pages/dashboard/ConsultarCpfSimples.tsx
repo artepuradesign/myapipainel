@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -34,7 +34,7 @@ import { cookieUtils } from '@/utils/cookieUtils';
 import PriceDisplay from '@/components/dashboard/PriceDisplay';
 import { checkBalanceForModule } from '@/utils/balanceChecker';
 import { getModulePrice } from '@/utils/modulePrice';
-import { getModulePriceById } from '@/services/moduleService';
+import { useApiModules } from '@/hooks/useApiModules';
 import ConsultaHistoryItem from '@/components/consultas/ConsultaHistoryItem';
 import ConsultationCard from '@/components/historico/ConsultationCard';
 import ConsultationsSection from '@/components/historico/sections/ConsultationsSection';
@@ -574,6 +574,7 @@ interface CPFResult {
 const ConsultarCpfPuxaTudo = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { modules } = useApiModules();
   const [cpf, setCpf] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CPFResult | null>(null);
@@ -664,6 +665,22 @@ const ConsultarCpfPuxaTudo = () => {
     calculateDiscountedPrice: calculateSubscriptionDiscount,
     isLoading: subscriptionLoading 
   } = useUserSubscription();
+
+  const currentModule = useMemo(() => {
+    const normalizeModuleRoute = (module: any): string => {
+      const raw = (module?.api_endpoint || module?.path || '').toString().trim();
+      if (!raw) return '';
+      if (raw.startsWith('/')) return raw;
+      if (raw.startsWith('dashboard/')) return `/${raw}`;
+      if (!raw.includes('/')) return `/dashboard/${raw}`;
+      return raw;
+    };
+
+    const pathname = (location?.pathname || '').trim();
+    if (!pathname) return null;
+
+    return (modules || []).find((m: any) => normalizeModuleRoute(m) === pathname) || null;
+  }, [modules, location?.pathname]);
   
   // Hooks para dados relacionados - mesmo padrão do CpfView
   const { getCreditinksByCpfId } = useBaseCredilink();
@@ -764,8 +781,7 @@ const ConsultarCpfPuxaTudo = () => {
     if (user) {
       loadBalances();
       reloadApiBalance(); // Carregar saldo da API externa
-      loadModulePrice(); // Carregar preço do módulo ID 83
-      
+
       // Carregar dados em paralelo
       Promise.all([
         loadConsultationHistory(), // Carregar histórico do banco
@@ -778,6 +794,12 @@ const ConsultarCpfPuxaTudo = () => {
       });
     }
   }, [user, reloadApiBalance]);
+
+  useEffect(() => {
+    if (!user) return;
+    loadModulePrice();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, currentModule?.id]);
 
   // Verificar se veio do histórico com dados de consulta
   useEffect(() => {
@@ -914,34 +936,28 @@ const ConsultarCpfPuxaTudo = () => {
     });
   };
 
-  // Carregar preço do módulo ID 83 da API
-  const loadModulePrice = async () => {
-    try {
-      setModulePriceLoading(true);
-      console.log('💰 Carregando preço do módulo ID 83 via API...');
-      
-      // Buscar preço direto da API usando o serviço correto
-      const price = await getModulePriceById(83);
-      
-      if (price && price > 0) {
-        setModulePrice(price);
-        console.log('✅ Preço do módulo ID 83 carregado da API:', price);
-      } else {
-        console.warn('⚠️ Preço inválido recebido da API, usando fallback');
-        // Fallback para o preço padrão do moduleData.ts apenas se API falhar
-        const fallbackPrice = getModulePrice('/dashboard/consultar-cpf');
-        setModulePrice(fallbackPrice);
-        console.log('⚠️ Usando preço fallback:', fallbackPrice);
-      }
-    } catch (error) {
-      console.error('❌ Erro ao carregar preço do módulo ID 83:', error);
-      // Fallback para o preço padrão do moduleData.ts
-      const fallbackPrice = getModulePrice('/dashboard/consultar-cpf');
-      setModulePrice(fallbackPrice);
-      console.log('⚠️ Usando preço fallback devido ao erro:', fallbackPrice);
-    } finally {
+  // Carregar preço do módulo (Preço de Venda) com base na rota atual
+  const loadModulePrice = () => {
+    setModulePriceLoading(true);
+
+    const rawPrice = currentModule?.price;
+    const price = Number(rawPrice ?? 0);
+
+    if (price && price > 0) {
+      setModulePrice(price);
+      console.log('✅ Preço do módulo carregado da configuração do módulo:', {
+        moduleId: currentModule?.id,
+        moduleTitle: currentModule?.title,
+        price
+      });
       setModulePriceLoading(false);
+      return;
     }
+
+    console.warn('⚠️ Não foi possível obter o preço do módulo pela configuração; usando fallback');
+    const fallbackPrice = getModulePrice(location.pathname || '/dashboard/consultar-cpf');
+    setModulePrice(fallbackPrice);
+    setModulePriceLoading(false);
   };
 
   // Carregar histórico de consultas usando API; fallback se endpoint não existir
