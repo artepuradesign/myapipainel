@@ -24,7 +24,7 @@ const SimpleTitleBar = ({
       <CardHeader className="px-4 md:px-6">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1 min-w-0">
-            <CardTitle className="flex items-center gap-2 text-base md:text-lg">
+            <CardTitle className="flex items-center gap-2 text-base">
               {icon ? <span className="shrink-0 text-primary">{icon}</span> : null}
               <span className="truncate">{title}</span>
             </CardTitle>
