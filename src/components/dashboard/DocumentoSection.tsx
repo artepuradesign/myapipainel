@@ -111,10 +111,6 @@
            </CardTitle>
  
            <div className="flex items-center gap-2 flex-shrink-0">
-             <Badge variant="secondary" className="uppercase tracking-wide">
-               Online
-             </Badge>
- 
              {hasData ? (
                <Button
                  variant="ghost"
@@ -126,6 +122,10 @@
                  <Copy className="h-4 w-4" />
                </Button>
              ) : null}
+
+              <Badge variant="secondary" className="uppercase tracking-wide">
+                Online
+              </Badge>
            </div>
          </div>
        </CardHeader>
