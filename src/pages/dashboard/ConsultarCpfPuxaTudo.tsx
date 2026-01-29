@@ -2362,48 +2362,49 @@ Todos os direitos reservados.`;
            {/* Score + CSB8 + CSBA (responsivo e compacto) */}
            <section className="mx-auto w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
              <Card id="score-section" className={onlineCardClass(hasValue(result.score))}>
-                 <CardHeader className="p-2 pb-1">
-                 <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-xs sm:text-sm">
-                      <TrendingUp className="h-3.5 w-3.5" />
-                     Score
-                   </CardTitle>
-                    <div className="flex items-center gap-2">
-                     <Button
-                       variant="ghost"
-                       size="icon"
-                       onClick={() => {
-                         const dados = [
-                           `SCORE: ${result.score || '-'}`,
-                           `FAIXA: ${scoreData.label || '-'}`,
-                         ].join('\n');
-                         navigator.clipboard.writeText(dados);
-                         toast.success('Score copiado!');
-                       }}
-                        className="h-7 w-7"
-                       title="Copiar dados da seção"
-                     >
-                       <Copy className="h-4 w-4" />
-                     </Button>
-
-                      <div className="relative inline-flex">
-                        <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
-                          Online
-                        </Badge>
-                        {scoreCount > 0 ? (
-                          <span
-                            className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                            aria-label={`Quantidade de registros Score: ${scoreCount}`}
+                  <CardContent className="p-2 space-y-1">
+                    <ScoreGaugeCard
+                      title="SCORE"
+                      score={result.score}
+                      faixa={scoreData.label}
+                      icon="chart"
+                      compact
+                      embedded
+                      headerRight={
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              const dados = [
+                                `SCORE: ${result.score || '-'}`,
+                                `FAIXA: ${scoreData.label || '-'}`,
+                              ].join('\n');
+                              navigator.clipboard.writeText(dados);
+                              toast.success('Score copiado!');
+                            }}
+                            className="h-7 w-7"
+                            title="Copiar dados da seção"
                           >
-                            {scoreCount}
-                          </span>
-                        ) : null}
-                      </div>
-                   </div>
-                 </div>
-               </CardHeader>
-                 <CardContent className="p-2 pt-0 space-y-1">
-                   <ScoreGaugeCard title="SCORE" score={result.score} faixa={scoreData.label} icon="chart" compact embedded />
+                            <Copy className="h-4 w-4" />
+                          </Button>
+
+                          <div className="relative inline-flex">
+                            <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
+                              Online
+                            </Badge>
+                            {scoreCount > 0 ? (
+                              <span
+                                className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                                aria-label={`Quantidade de registros Score: ${scoreCount}`}
+                              >
+                                {scoreCount}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+                      }
+                    />
                   {scoreData.description !== 'Score baixo, precisa de atenção' && (
                     <p className="text-xs text-muted-foreground">{scoreData.description}</p>
                   )}
@@ -2411,94 +2412,96 @@ Todos os direitos reservados.`;
              </Card>
 
              <Card id="csb8-section" className={onlineCardClass(hasValue(result.csb8) || hasValue(result.csb8_faixa))}>
-                 <CardHeader className="p-2 pb-1">
-                 <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-xs sm:text-sm">
-                      <TrendingUp className="h-3.5 w-3.5" />
-                     CSB8
-                   </CardTitle>
-                    <div className="flex items-center gap-2">
-                     <Button
-                       variant="ghost"
-                       size="icon"
-                       onClick={() => {
-                         const dados = [
-                           `CSB8: ${result.csb8 || '-'}`,
-                           `FAIXA: CSB8 [SCORE]: ${result.csb8_faixa || '-'}`,
-                         ].join('\n');
-                         navigator.clipboard.writeText(dados);
-                         toast.success('CSB8 copiado!');
-                       }}
-                        className="h-7 w-7"
-                       title="Copiar dados da seção"
-                     >
-                       <Copy className="h-4 w-4" />
-                     </Button>
-
-                      <div className="relative inline-flex">
-                        <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
-                          Online
-                        </Badge>
-                        {csb8Count > 0 ? (
-                          <span
-                            className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                            aria-label={`Quantidade de registros CSB8: ${csb8Count}`}
+                  <CardContent className="p-2">
+                    <ScoreGaugeCard
+                      title="CSB8 [SCORE]"
+                      score={result.csb8}
+                      faixa={result.csb8_faixa}
+                      icon="chart"
+                      compact
+                      embedded
+                      headerRight={
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              const dados = [
+                                `CSB8: ${result.csb8 || '-'}`,
+                                `FAIXA: CSB8 [SCORE]: ${result.csb8_faixa || '-'}`,
+                              ].join('\n');
+                              navigator.clipboard.writeText(dados);
+                              toast.success('CSB8 copiado!');
+                            }}
+                            className="h-7 w-7"
+                            title="Copiar dados da seção"
                           >
-                            {csb8Count}
-                          </span>
-                        ) : null}
-                      </div>
-                   </div>
-                 </div>
-               </CardHeader>
-                 <CardContent className="p-2 pt-0">
-                   <ScoreGaugeCard title="CSB8 [SCORE]" score={result.csb8} faixa={result.csb8_faixa} icon="chart" compact embedded />
+                            <Copy className="h-4 w-4" />
+                          </Button>
+
+                          <div className="relative inline-flex">
+                            <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
+                              Online
+                            </Badge>
+                            {csb8Count > 0 ? (
+                              <span
+                                className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                                aria-label={`Quantidade de registros CSB8: ${csb8Count}`}
+                              >
+                                {csb8Count}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+                      }
+                    />
                </CardContent>
              </Card>
 
              <Card id="csba-section" className={onlineCardClass(hasValue(result.csba) || hasValue(result.csba_faixa))}>
-                 <CardHeader className="p-2 pb-1">
-                 <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-xs sm:text-sm">
-                      <TrendingUp className="h-3.5 w-3.5" />
-                     CSBA
-                   </CardTitle>
-                    <div className="flex items-center gap-2">
-                     <Button
-                       variant="ghost"
-                       size="icon"
-                       onClick={() => {
-                         const dados = [
-                           `CSBA: ${result.csba || '-'}`,
-                           `FAIXA: CSBA [SCORE]: ${result.csba_faixa || '-'}`,
-                         ].join('\n');
-                         navigator.clipboard.writeText(dados);
-                         toast.success('CSBA copiado!');
-                       }}
-                        className="h-7 w-7"
-                       title="Copiar dados da seção"
-                     >
-                       <Copy className="h-4 w-4" />
-                     </Button>
-
-                      <div className="relative inline-flex">
-                        <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
-                          Online
-                        </Badge>
-                        {csbaCount > 0 ? (
-                          <span
-                            className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                            aria-label={`Quantidade de registros CSBA: ${csbaCount}`}
+                  <CardContent className="p-2">
+                    <ScoreGaugeCard
+                      title="CSBA [SCORE]"
+                      score={result.csba}
+                      faixa={result.csba_faixa}
+                      icon="trending"
+                      compact
+                      embedded
+                      headerRight={
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              const dados = [
+                                `CSBA: ${result.csba || '-'}`,
+                                `FAIXA: CSBA [SCORE]: ${result.csba_faixa || '-'}`,
+                              ].join('\n');
+                              navigator.clipboard.writeText(dados);
+                              toast.success('CSBA copiado!');
+                            }}
+                            className="h-7 w-7"
+                            title="Copiar dados da seção"
                           >
-                            {csbaCount}
-                          </span>
-                        ) : null}
-                      </div>
-                   </div>
-                 </div>
-               </CardHeader>
-                 <CardContent className="p-2 pt-0">
-                   <ScoreGaugeCard title="CSBA [SCORE]" score={result.csba} faixa={result.csba_faixa} icon="trending" compact embedded />
+                            <Copy className="h-4 w-4" />
+                          </Button>
+
+                          <div className="relative inline-flex">
+                            <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
+                              Online
+                            </Badge>
+                            {csbaCount > 0 ? (
+                              <span
+                                className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                                aria-label={`Quantidade de registros CSBA: ${csbaCount}`}
+                              >
+                                {csbaCount}
+                              </span>
+                            ) : null}
+                          </div>
+                        </div>
+                      }
+                    />
                </CardContent>
              </Card>
            </section>
