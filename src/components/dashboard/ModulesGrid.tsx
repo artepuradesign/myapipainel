@@ -21,6 +21,7 @@ interface ApiModule {
   price: string;
   icon: string;
   path: string;
+  api_endpoint?: string;
   operationalStatus: 'on' | 'off' | 'manutencao';
   panelId: string;
   color: string;
@@ -133,7 +134,11 @@ const ModulesGrid: React.FC<ModulesGridProps> = ({ currentPlan, onModuleClick, p
             description: module.description || '',
             price: typeof module.price === 'number' ? module.price.toFixed(2).replace('.', ',') : (module.price || '0,00'),
             icon: module.icon || 'Package',
-            path: `/module/${module.slug}`,
+            // `api_endpoint` agora representa a rota interna da página do módulo (ex.: /dashboard/consultar-cpf-simples)
+            api_endpoint: module.api_endpoint || module.path || '',
+            path: (module.api_endpoint || module.path || '').toString().trim().startsWith('/')
+              ? (module.api_endpoint || module.path || '').toString().trim()
+              : `/module/${module.slug}`,
             operationalStatus: module.operational_status as 'on' | 'off' | 'manutencao',
             panelId: module.panel_id.toString(),
             color: module.color || '#6366f1',

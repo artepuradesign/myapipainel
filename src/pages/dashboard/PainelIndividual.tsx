@@ -61,6 +61,14 @@ const PainelIndividual = () => {
     return numericValue.toFixed(2).replace('.', ',');
   };
 
+  const getModulePageRoute = (module: any): string => {
+    // Agora o campo `api_endpoint` representa a rota interna da página do módulo (ex.: /dashboard/consultar-cpf-simples)
+    const route = (module?.api_endpoint || module?.path || '').toString().trim();
+    if (route.startsWith('/')) return route;
+    // Fallback legado
+    return `/module/${module.slug}`;
+  };
+
   const getPanelModules = () => {
     if (!panel) return [];
     
@@ -108,7 +116,7 @@ const PainelIndividual = () => {
       return;
     }
 
-    navigate(`/module/${module.slug}`);
+    navigate(getModulePageRoute(module));
   };
 
   if (panelLoading) {
