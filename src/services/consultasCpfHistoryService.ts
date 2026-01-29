@@ -63,7 +63,11 @@ function getHeaders(): HeadersInit {
 
 export const consultasCpfHistoryService = {
   // Buscar histórico de consultas CPF (ambas tabelas) - usa endpoint correto
-  async getHistory(page: number = 1, limit: number = 50): Promise<ApiResponse<ConsultaCpfHistoryResponse>> {
+  async getHistory(
+    page: number = 1,
+    limit: number = 50,
+    opts?: { bypassCache?: boolean }
+  ): Promise<ApiResponse<ConsultaCpfHistoryResponse>> {
     console.log('📋 [CPF_HISTORY_API] Buscando histórico de consultas CPF');
     console.log('🔗 [CPF_HISTORY_API] Usando pool de conexões via apiRequest');
     
@@ -71,43 +75,48 @@ export const consultasCpfHistoryService = {
     await fetchApiConfig();
     
     const offset = (page - 1) * limit;
-    
-    // Usar o endpoint correto /consultas/history
-    const response = await apiRequest<ApiResponse<any[]>>(`/consultas/history?limit=${limit}&offset=${offset}`, {
-      headers: getHeaders()
+
+    // Endpoint real do backend PHP (ver api/src/routes/consultas_cpf_history.php)
+    const endpoint = `/consultas-cpf-history?limit=${limit}&offset=${offset}`;
+    const headers: HeadersInit = {
+      ...getHeaders(),
+      ...(opts?.bypassCache ? { 'X-Bypass-Cache': String(Date.now()) } : {}),
+    };
+
+    const response = await apiRequest<ApiResponse<any>>(endpoint, {
+      headers,
     });
     
-    // Transformar resposta no formato esperado
-    if (response.success && Array.isArray(response.data)) {
-      const cpfConsultations = response.data.filter((c: any) => c.module_type === 'cpf');
-      const total = cpfConsultations.length;
-      
-      return {
-        success: true,
-        data: {
-          data: cpfConsultations.map((item: any) => ({
-            id: item.id,
-            source_table: 'consultations' as const,
-            document: item.document,
-            cost: item.cost,
-            status: item.status,
-            created_at: item.created_at,
-            updated_at: item.updated_at,
-            result_data: item.result_data,
-            desconto_aplicado: item.metadata?.discount || 0,
-            saldo_usado: item.metadata?.saldo_usado || 'carteira',
-            metadata: item.metadata
-          })),
-          pagination: {
-            total,
-            page,
-            limit,
-            total_pages: Math.ceil(total / limit),
-            has_next: (page * limit) < total,
-            has_prev: page > 1
-          }
-        }
-      };
+    // Normalizar formatos possíveis de retorno
+    if (response?.success) {
+      const payload: any = response.data;
+
+      // Formato esperado: { data: [], pagination: {} }
+      if (payload && Array.isArray(payload.data) && payload.pagination) {
+        return {
+          success: true,
+          data: payload as ConsultaCpfHistoryResponse,
+        };
+      }
+
+      // Formato legado: []
+      if (Array.isArray(payload)) {
+        const total = payload.length;
+        return {
+          success: true,
+          data: {
+            data: payload,
+            pagination: {
+              total,
+              page,
+              limit,
+              total_pages: Math.ceil(total / limit),
+              has_next: page * limit < total,
+              has_prev: page > 1,
+            },
+          },
+        };
+      }
     }
     
     return {
@@ -137,18 +146,24 @@ export const consultasCpfHistoryService = {
     
     try {
       // Buscar todas as consultas para calcular estatísticas
-      const response = await apiRequest<ApiResponse<any[]>>('/consultas/history?limit=1000&offset=0', {
-        headers: getHeaders()
+      const response = await apiRequest<ApiResponse<any>>('/consultas-cpf-history?limit=1000&offset=0', {
+        headers: getHeaders(),
       });
       
-      if (!response.success || !Array.isArray(response.data)) {
+      const list = Array.isArray((response as any).data)
+        ? (response as any).data
+        : Array.isArray((response as any).data?.data)
+          ? (response as any).data.data
+          : null;
+
+      if (!response.success || !Array.isArray(list)) {
         return {
           success: false,
           error: 'Erro ao buscar consultas para estatísticas'
         };
       }
       
-      const consultas = response.data.filter((c: any) => c.module_type === 'cpf');
+      const consultas = list;
       const today = new Date().toDateString();
       const thisMonth = new Date().getMonth();
       const thisYear = new Date().getFullYear();

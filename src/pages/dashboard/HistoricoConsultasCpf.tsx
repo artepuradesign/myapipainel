@@ -7,7 +7,6 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ArrowLeft, FileText, RefreshCw } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { consultasCpfHistoryService, type ConsultaCpfHistoryItem } from '@/services/consultasCpfHistoryService';
-import { consultationsService } from '@/services/consultationsService';
 import { toast } from 'sonner';
 
 const formatCPF = (cpf: string) => {
@@ -42,7 +41,7 @@ const HistoricoConsultasCpf: React.FC = () => {
   const load = async () => {
     setLoading(true);
     try {
-      const res = await consultasCpfHistoryService.getHistory(1, 200);
+      const res = await consultasCpfHistoryService.getHistory(1, 200, { bypassCache: true });
       if (res.success && res.data?.data) {
         setItems(res.data.data);
       } else {
@@ -64,15 +63,19 @@ const HistoricoConsultasCpf: React.FC = () => {
     // Recarregar do banco (API) e abrir na tela de consulta SEM cobrar
     setOpeningId(item.id);
     try {
-      const res = await consultationsService.getById(item.id);
+      // O backend não possui /consultas/:id implementado (501). Então recarregamos via histórico
+      // para garantir "consulta ao banco" sem cobrança.
+      const res = await consultasCpfHistoryService.getHistory(1, 200, { bypassCache: true });
+      const fresh = res.success ? res.data?.data?.find((x) => x.id === item.id && x.source_table === item.source_table) : undefined;
+      const current = fresh ?? item;
 
-      if (!res.success || !res.data) {
-        toast.error(res.message || res.error || 'Não foi possível carregar a consulta');
+      if (!current?.result_data) {
+        toast.error('Não foi possível recarregar os dados desta consulta');
         return;
       }
 
-      const consultationData = (res.data as any).result_data ?? res.data;
-      const cpf = (res.data as any).document ?? item.document;
+      const consultationData = current.result_data;
+      const cpf = current.document;
 
       navigate('/dashboard/consultar-cpf-puxa-tudo', {
         state: {
@@ -100,10 +103,12 @@ const HistoricoConsultasCpf: React.FC = () => {
                 <FileText className="h-4 w-4 md:h-5 md:w-5" />
                 Histórico de Consultas (CPF)
               </CardTitle>
-              <div className="mt-1 flex flex-wrap items-center gap-2">
-                <Badge variant="secondary">{total} registros</Badge>
+              <div className="mt-2 flex flex-wrap items-center gap-2">
+                <Badge variant="secondary" className="rounded-full">
+                  {total} registros
+                </Badge>
               </div>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="mt-1 text-xs text-muted-foreground break-words">
                 Toque em um registro para recarregar do banco e abrir sem cobrança.
               </p>
             </div>
@@ -161,12 +166,7 @@ const HistoricoConsultasCpf: React.FC = () => {
 
                       {isOpening ? (
                         <div className="mt-0.5 animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
-                      ) : (
-                        <div className="text-right">
-                          <div className="text-xs font-medium text-destructive">{formatCurrency(Number(item.cost) || 0)}</div>
-                          <div className="text-[11px] text-muted-foreground mt-0.5">abrir</div>
-                        </div>
-                      )}
+                      ) : null}
                     </div>
                   </button>
                 );
