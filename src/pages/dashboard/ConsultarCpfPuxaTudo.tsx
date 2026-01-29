@@ -3027,7 +3027,7 @@ Todos os direitos reservados.`;
               <FileText className={`mr-2 flex-shrink-0 ${isMobile ? 'h-4 w-4' : 'h-4 w-4 sm:h-5 sm:w-5'}`} />
               <span className="truncate">Últimas Consultas</span>
             </CardTitle>
-            <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 text-xs sm:text-sm flex-shrink-0">
+            <Badge variant="secondary" className="text-xs sm:text-sm flex-shrink-0">
               {recentConsultations.length} Recentes
             </Badge>
           </div>
@@ -3038,211 +3038,102 @@ Todos os direitos reservados.`;
         <CardContent>
           {recentConsultationsLoading ? (
             <div className="flex items-center justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-purple"></div>
-              <span className="ml-3 text-gray-600 dark:text-gray-400">Carregando consultas...</span>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+              <span className="ml-3 text-muted-foreground">Carregando consultas...</span>
             </div>
           ) : recentConsultations.length > 0 ? (
-            <div className="space-y-4">
-              {/* Desktop Table View */}
-              <div className="hidden md:block overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead className="w-32">CPF</TableHead>
-                      <TableHead className="w-48">Data e Hora</TableHead>
-                      <TableHead className="w-24 text-right">Valor</TableHead>
-                      <TableHead className="w-24 text-center">Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentConsultations.map((consultation) => {
-                      const formatCPF = (cpf: string) => {
-                        if (!cpf || cpf === 'CPF consultado') return 'N/A';
-                        const cleaned = cpf.replace(/\D/g, '');
-                        if (cleaned.length === 11) {
-                          return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-                        }
-                        return cpf;
-                      };
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-40 whitespace-nowrap">CPF</TableHead>
+                    <TableHead className="min-w-[180px] whitespace-nowrap">Data e Hora</TableHead>
+                    <TableHead className="w-28 text-right whitespace-nowrap">Valor</TableHead>
+                    <TableHead className="w-28 text-center whitespace-nowrap">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {recentConsultations.map((consultation) => {
+                    const formatCPF = (cpf: string) => {
+                      if (!cpf || cpf === 'CPF consultado') return 'N/A';
+                      const cleaned = cpf.replace(/\D/g, '');
+                      if (cleaned.length === 11) {
+                        return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                      }
+                      return cpf;
+                    };
 
-                      const formatFullDate = (dateString: string) => {
-                        const date = new Date(dateString);
-                        return date.toLocaleString('pt-BR', {
-                          day: '2-digit',
-                          month: '2-digit',
-                          year: 'numeric',
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit'
-                        });
-                      };
+                    const formatFullDate = (dateString: string) => {
+                      const date = new Date(dateString);
+                      return date.toLocaleString('pt-BR', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                      });
+                    };
 
-                      const consultationValue = consultation.cost || consultation.amount || 0;
-                      const numericValue = typeof consultationValue === 'string' 
-                        ? parseFloat(consultationValue.toString().replace(',', '.')) 
+                    const consultationValue = consultation.cost || consultation.amount || 0;
+                    const numericValue =
+                      typeof consultationValue === 'string'
+                        ? parseFloat(consultationValue.toString().replace(',', '.'))
                         : Number(consultationValue) || 0;
 
-                      return (
-                        <TableRow 
-                          key={consultation.id} 
-                          className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-                          onClick={() => {
-                            // Exibir consulta na mesma tela sem cobrar novamente
-                            if (consultation.result_data) {
-                              setResult(consultation.result_data);
-                              setCpf(consultation.document);
-                              setLoading(false);
-                              
-                              // Buscar dados da Receita Federal se disponível
-                              baseReceitaService.getByCpf(consultation.document).then(receitaResult => {
-                                if (receitaResult.success && receitaResult.data) {
-                                  setReceitaData(receitaResult.data);
-                                }
-                              });
-                              
-                              // Scroll suave para a seção de resultados
-                              setTimeout(() => {
-                                resultRef.current?.scrollIntoView({ 
-                                  behavior: 'smooth', 
-                                  block: 'start' 
-                                });
-                              }, 100);
-                              
-                              toast.success('Consulta carregada do histórico (sem cobrança)', { duration: 2000 });
-                            } else {
-                              toast.error('Dados da consulta não disponíveis');
-                            }
-                          }}
-                        >
-                          <TableCell className="font-mono text-sm">
-                            {formatCPF(consultation.document || '')}
-                          </TableCell>
-                          <TableCell className="text-sm">
-                            {formatFullDate(consultation.created_at)}
-                          </TableCell>
-                          <TableCell className="text-right text-sm font-medium text-red-600 dark:text-red-400">
-                            R$ {numericValue.toFixed(2).replace('.', ',')}
-                          </TableCell>
-                          <TableCell className="text-center">
-                            <Badge 
-                              variant={consultation.status === 'completed' ? 'default' : 'secondary'}
-                              className="text-xs"
-                            >
-                              {consultation.status === 'completed' ? 'Concluída' : 'Pendente'}
-                            </Badge>
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
-                  </TableBody>
-                </Table>
-              </div>
+                    const handleLoadConsultation = () => {
+                      // Exibir consulta na mesma tela sem cobrar novamente
+                      if (consultation.result_data) {
+                        setResult(consultation.result_data);
+                        setCpf(consultation.document);
+                        setLoading(false);
 
-              {/* Mobile Card View */}
-              <div className="block md:hidden space-y-3">
-                {recentConsultations.map((consultation) => {
-                  const formatCPF = (cpf: string) => {
-                    if (!cpf || cpf === 'CPF consultado') return 'N/A';
-                    const cleaned = cpf.replace(/\D/g, '');
-                    if (cleaned.length === 11) {
-                      return cleaned.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
-                    }
-                    return cpf;
-                  };
+                        // Buscar dados da Receita Federal se disponível
+                        baseReceitaService.getByCpf(consultation.document).then((receitaResult) => {
+                          if (receitaResult.success && receitaResult.data) {
+                            setReceitaData(receitaResult.data);
+                          }
+                        });
 
-                  const formatFullDate = (dateString: string) => {
-                    const date = new Date(dateString);
-                    return date.toLocaleString('pt-BR', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    });
-                  };
-
-                  const consultationValue = consultation.cost || consultation.amount || 0;
-                  const numericValue = typeof consultationValue === 'string' 
-                    ? parseFloat(consultationValue.toString().replace(',', '.')) 
-                    : Number(consultationValue) || 0;
-
-                  return (
-                    <Card 
-                      key={consultation.id} 
-                      className="border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-purple-400 dark:hover:border-purple-600 transition-colors"
-                      onClick={() => {
-                        // Exibir consulta na mesma tela sem cobrar novamente
-                        if (consultation.result_data) {
-                          setResult(consultation.result_data);
-                          setCpf(consultation.document);
-                          setLoading(false);
-                          
-                          // Buscar dados da Receita Federal se disponível
-                          baseReceitaService.getByCpf(consultation.document).then(receitaResult => {
-                            if (receitaResult.success && receitaResult.data) {
-                              setReceitaData(receitaResult.data);
-                            }
+                        // Scroll suave para a seção de resultados
+                        setTimeout(() => {
+                          resultRef.current?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
                           });
-                          
-                          // Scroll suave para a seção de resultados
-                          setTimeout(() => {
-                            resultRef.current?.scrollIntoView({ 
-                              behavior: 'smooth', 
-                              block: 'start' 
-                            });
-                          }, 100);
-                          
-                          toast.success('Consulta carregada do histórico (sem cobrança)', { duration: 2000 });
-                        } else {
-                          toast.error('Dados da consulta não disponíveis');
-                        }
-                      }}
-                    >
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between mb-3">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">ID:</span>
-                              <span className="text-xs font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-                                {consultation.id.toString().slice(0, 8)}...
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">CPF:</span>
-                              <span className="text-sm font-mono font-semibold text-gray-900 dark:text-gray-100">
-                                {formatCPF(consultation.document || '')}
-                              </span>
-                            </div>
-                          </div>
-                          <Badge 
-                            variant={consultation.status === 'completed' ? 'default' : 'secondary'}
-                            className="text-xs"
-                          >
+                        }, 100);
+
+                        toast.success('Consulta carregada do histórico (sem cobrança)', { duration: 2000 });
+                      } else {
+                        toast.error('Dados da consulta não disponíveis');
+                      }
+                    };
+
+                    return (
+                      <TableRow
+                        key={consultation.id}
+                        className="cursor-pointer"
+                        onClick={handleLoadConsultation}
+                      >
+                        <TableCell className="font-mono text-xs sm:text-sm whitespace-nowrap">
+                          {formatCPF(consultation.document || '')}
+                        </TableCell>
+                        <TableCell className="text-xs sm:text-sm whitespace-nowrap">
+                          {formatFullDate(consultation.created_at)}
+                        </TableCell>
+                        <TableCell className="text-right text-xs sm:text-sm font-medium text-destructive whitespace-nowrap">
+                          R$ {numericValue.toFixed(2).replace('.', ',')}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Badge variant={consultation.status === 'completed' ? 'default' : 'secondary'} className="text-xs rounded-full">
                             {consultation.status === 'completed' ? 'Concluída' : 'Pendente'}
                           </Badge>
-                        </div>
-                        
-                        <div className="border-t border-gray-100 dark:border-gray-700 pt-3">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Data/Hora:</span>
-                              <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
-                                {formatFullDate(consultation.created_at)}
-                              </p>
-                            </div>
-                            <div className="text-right">
-                              <span className="text-xs font-medium text-gray-500 dark:text-gray-400">Valor:</span>
-                              <p className="text-sm font-bold text-red-600 dark:text-red-400 mt-1">
-                                R$ {numericValue.toFixed(2).replace('.', ',')}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })}
-              </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
             </div>
           ) : (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -3262,7 +3153,7 @@ Todos os direitos reservados.`;
                 variant="outline" 
                 size={isMobile ? "sm" : "sm"}
                 onClick={() => navigate('/dashboard/historico')}
-                className="text-blue-600 border-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950"
+                className="text-primary border-primary hover:bg-muted"
               >
                 <FileText className={`mr-2 ${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
                 <span className={isMobile ? 'text-xs' : 'text-sm'}>
