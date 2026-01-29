@@ -2360,12 +2360,12 @@ Todos os direitos reservados.`;
           </div>
 
            {/* Score + CSB8 + CSBA (responsivo e compacto) */}
-           <div className="mx-auto w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+           <section className="mx-auto w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
              <Card id="score-section" className={onlineCardClass(hasValue(result.score))}>
-                <CardHeader className="p-3 pb-2">
+                 <CardHeader className="p-2 pb-1">
                  <div className="flex items-center justify-between">
-                   <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                     <TrendingUp className="h-4 w-4" />
+                    <CardTitle className="flex items-center gap-2 text-xs sm:text-sm">
+                      <TrendingUp className="h-3.5 w-3.5" />
                      Score
                    </CardTitle>
                     <div className="flex items-center gap-2">
@@ -2380,14 +2380,14 @@ Todos os direitos reservados.`;
                          navigator.clipboard.writeText(dados);
                          toast.success('Score copiado!');
                        }}
-                       className="h-8 w-8"
+                        className="h-7 w-7"
                        title="Copiar dados da seção"
                      >
                        <Copy className="h-4 w-4" />
                      </Button>
 
                       <div className="relative inline-flex">
-                        <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                        <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
                           Online
                         </Badge>
                         {scoreCount > 0 ? (
@@ -2402,7 +2402,7 @@ Todos os direitos reservados.`;
                    </div>
                  </div>
                </CardHeader>
-                <CardContent className="p-3 pt-0 space-y-2">
+                 <CardContent className="p-2 pt-0 space-y-1">
                   <ScoreGaugeCard title="SCORE" score={result.score} faixa={scoreData.label} icon="chart" compact />
                   {scoreData.description !== 'Score baixo, precisa de atenção' && (
                     <p className="text-xs text-muted-foreground">{scoreData.description}</p>
@@ -2411,10 +2411,10 @@ Todos os direitos reservados.`;
              </Card>
 
              <Card id="csb8-section" className={onlineCardClass(hasValue(result.csb8) || hasValue(result.csb8_faixa))}>
-                <CardHeader className="p-3 pb-2">
+                 <CardHeader className="p-2 pb-1">
                  <div className="flex items-center justify-between">
-                   <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                     <TrendingUp className="h-4 w-4" />
+                    <CardTitle className="flex items-center gap-2 text-xs sm:text-sm">
+                      <TrendingUp className="h-3.5 w-3.5" />
                      CSB8
                    </CardTitle>
                     <div className="flex items-center gap-2">
@@ -2429,14 +2429,14 @@ Todos os direitos reservados.`;
                          navigator.clipboard.writeText(dados);
                          toast.success('CSB8 copiado!');
                        }}
-                       className="h-8 w-8"
+                        className="h-7 w-7"
                        title="Copiar dados da seção"
                      >
                        <Copy className="h-4 w-4" />
                      </Button>
 
                       <div className="relative inline-flex">
-                        <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                        <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
                           Online
                         </Badge>
                         {csb8Count > 0 ? (
@@ -2451,16 +2451,16 @@ Todos os direitos reservados.`;
                    </div>
                  </div>
                </CardHeader>
-                <CardContent className="p-3 pt-0">
+                 <CardContent className="p-2 pt-0">
                   <ScoreGaugeCard title="CSB8 [SCORE]" score={result.csb8} faixa={result.csb8_faixa} icon="chart" compact />
                </CardContent>
              </Card>
 
              <Card id="csba-section" className={onlineCardClass(hasValue(result.csba) || hasValue(result.csba_faixa))}>
-                <CardHeader className="p-3 pb-2">
+                 <CardHeader className="p-2 pb-1">
                  <div className="flex items-center justify-between">
-                   <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-                     <TrendingUp className="h-4 w-4" />
+                    <CardTitle className="flex items-center gap-2 text-xs sm:text-sm">
+                      <TrendingUp className="h-3.5 w-3.5" />
                      CSBA
                    </CardTitle>
                     <div className="flex items-center gap-2">
@@ -2475,14 +2475,14 @@ Todos os direitos reservados.`;
                          navigator.clipboard.writeText(dados);
                          toast.success('CSBA copiado!');
                        }}
-                       className="h-8 w-8"
+                        className="h-7 w-7"
                        title="Copiar dados da seção"
                      >
                        <Copy className="h-4 w-4" />
                      </Button>
 
                       <div className="relative inline-flex">
-                        <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                        <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
                           Online
                         </Badge>
                         {csbaCount > 0 ? (
@@ -2497,11 +2497,11 @@ Todos os direitos reservados.`;
                    </div>
                  </div>
                </CardHeader>
-                <CardContent className="p-3 pt-0">
+                 <CardContent className="p-2 pt-0">
                   <ScoreGaugeCard title="CSBA [SCORE]" score={result.csba} faixa={result.csba_faixa} icon="trending" compact />
                </CardContent>
              </Card>
-           </div>
+           </section>
 
           {/* Dados Financeiros */}
           <Card id="dados-financeiros-section" className={onlineCardClass(hasDadosFinanceiros)}>
