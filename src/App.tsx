@@ -47,7 +47,6 @@ import BuscaMae from '@/pages/dashboard/BuscaMae';
 import BuscaPai from '@/pages/dashboard/BuscaPai';
 import CheckerLista from '@/pages/dashboard/CheckerLista';
 import Historico from '@/pages/dashboard/Historico';
-import HistoricoConsultasCpf from '@/pages/dashboard/HistoricoConsultasCpf';
 
 
 import Indique from '@/pages/dashboard/Indique';
@@ -174,7 +173,6 @@ function App() {
                     <Route path="/dashboard/busca-pai" element={<DashboardLayout><BuscaPai /></DashboardLayout>} />
                     <Route path="/dashboard/checker-lista" element={<DashboardLayout><CheckerLista /></DashboardLayout>} />
                     <Route path="/dashboard/historico" element={<DashboardLayout><Historico /></DashboardLayout>} />
-                    <Route path="/dashboard/historico-consultas-cpf" element={<DashboardLayout><HistoricoConsultasCpf /></DashboardLayout>} />
                     
                     
                     <Route path="/dashboard/indique" element={<DashboardLayout><Indique /></DashboardLayout>} />
