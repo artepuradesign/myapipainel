@@ -48,7 +48,9 @@ export const loadPanelMenusFromApi = async (): Promise<SidebarItem[]> => {
            ? moduleRouteRaw
            : moduleRouteRaw.startsWith('dashboard/')
              ? `/${moduleRouteRaw}`
-             : '';
+             : !moduleRouteRaw.includes('/') && moduleRouteRaw
+               ? `/dashboard/${moduleRouteRaw}`
+               : '';
         
         return {
           icon: ModuleIconComponent,
