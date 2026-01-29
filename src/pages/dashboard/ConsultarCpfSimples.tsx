@@ -1973,7 +1973,7 @@ Todos os direitos reservados.`;
           onBack={handleBack}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-4 md:gap-6 lg:gap-8">
+        <div className="mt-6 grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-4 md:gap-6 lg:gap-8">
         {/* Formulário de Consulta */}
         <Card className="dark:bg-gray-800 dark:border-gray-700 w-full">
           <CardHeader className="pb-4">
