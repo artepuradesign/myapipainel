@@ -35,27 +35,17 @@ const SimpleTitleBar = ({
             ) : null}
           </div>
 
-          {/* Mobile: botão circular simples (fica na “área verde”) */}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onBack}
-            className="md:hidden rounded-full h-9 w-9"
-            aria-label="Voltar"
-            title="Voltar"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-        </div>
-
-        {/* Desktop: ações + botão voltar padrão (remove do mobile) */}
-        <div className="hidden md:flex items-center justify-between gap-4 mt-4">
-          <div className="flex-1" />
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
             {right ? right : null}
-            <Button variant="outline" size="sm" onClick={onBack} className="h-8">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onBack}
+              className="rounded-full h-9 w-9"
+              aria-label="Voltar"
+              title="Voltar"
+            >
               <ArrowLeft className="h-4 w-4" />
-              Voltar
             </Button>
           </div>
         </div>
