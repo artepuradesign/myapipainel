@@ -2335,77 +2335,78 @@ Todos os direitos reservados.`;
             <FotosSection cpfId={result.id} cpfNumber={result.cpf} onCountChange={setFotosCount} />
           </div>
 
-          {/* CSB8 */}
-          <Card id="csb8-section" className={onlineCardClass(hasValue(result.csb8) || hasValue(result.csb8_faixa))}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg lg:text-xl">
-                  <TrendingUp className="h-5 w-5" />
-                  CSB8
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="uppercase tracking-wide">
-                    Online
-                  </Badge>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      const dados = [
-                        `CSB8: ${result.csb8 || '-'}`,
-                        `FAIXA: CSB8 [SCORE]: ${result.csb8_faixa || '-'}`,
-                      ].join('\n');
-                      navigator.clipboard.writeText(dados);
-                      toast.success('CSB8 copiado!');
-                    }}
-                    className="h-8 w-8"
-                    title="Copiar dados da seção"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
+          {/* CSB8 + CSBA (duas colunas, cards compactos) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Card id="csb8-section" className={onlineCardClass(hasValue(result.csb8) || hasValue(result.csb8_faixa))}>
+              <CardHeader className="p-4 pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                    <TrendingUp className="h-4 w-4" />
+                    CSB8
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                      Online
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        const dados = [
+                          `CSB8: ${result.csb8 || '-'}`,
+                          `FAIXA: CSB8 [SCORE]: ${result.csb8_faixa || '-'}`,
+                        ].join('\n');
+                        navigator.clipboard.writeText(dados);
+                        toast.success('CSB8 copiado!');
+                      }}
+                      className="h-8 w-8"
+                      title="Copiar dados da seção"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ScoreGaugeCard title="CSB8 [SCORE]" score={result.csb8} faixa={result.csb8_faixa} icon="chart" />
-            </CardContent>
-          </Card>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <ScoreGaugeCard title="CSB8 [SCORE]" score={result.csb8} faixa={result.csb8_faixa} icon="chart" />
+              </CardContent>
+            </Card>
 
-          {/* CSBA */}
-          <Card id="csba-section" className={onlineCardClass(hasValue(result.csba) || hasValue(result.csba_faixa))}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg lg:text-xl">
-                  <TrendingUp className="h-5 w-5" />
-                  CSBA
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="uppercase tracking-wide">
-                    Online
-                  </Badge>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      const dados = [
-                        `CSBA: ${result.csba || '-'}`,
-                        `FAIXA: CSBA [SCORE]: ${result.csba_faixa || '-'}`,
-                      ].join('\n');
-                      navigator.clipboard.writeText(dados);
-                      toast.success('CSBA copiado!');
-                    }}
-                    className="h-8 w-8"
-                    title="Copiar dados da seção"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
+            <Card id="csba-section" className={onlineCardClass(hasValue(result.csba) || hasValue(result.csba_faixa))}>
+              <CardHeader className="p-4 pb-2">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+                    <TrendingUp className="h-4 w-4" />
+                    CSBA
+                  </CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                      Online
+                    </Badge>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        const dados = [
+                          `CSBA: ${result.csba || '-'}`,
+                          `FAIXA: CSBA [SCORE]: ${result.csba_faixa || '-'}`,
+                        ].join('\n');
+                        navigator.clipboard.writeText(dados);
+                        toast.success('CSBA copiado!');
+                      }}
+                      className="h-8 w-8"
+                      title="Copiar dados da seção"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ScoreGaugeCard title="CSBA [SCORE]" score={result.csba} faixa={result.csba_faixa} icon="trending" />
-            </CardContent>
-          </Card>
+              </CardHeader>
+              <CardContent className="p-4 pt-0">
+                <ScoreGaugeCard title="CSBA [SCORE]" score={result.csba} faixa={result.csba_faixa} icon="trending" />
+              </CardContent>
+            </Card>
+          </div>
 
           {/* Dados Financeiros */}
           <Card id="dados-financeiros-section" className={onlineCardClass(hasDadosFinanceiros)}>
