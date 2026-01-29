@@ -2403,7 +2403,7 @@ Todos os direitos reservados.`;
                  </div>
                </CardHeader>
                  <CardContent className="p-2 pt-0 space-y-1">
-                  <ScoreGaugeCard title="SCORE" score={result.score} faixa={scoreData.label} icon="chart" compact />
+                   <ScoreGaugeCard title="SCORE" score={result.score} faixa={scoreData.label} icon="chart" compact embedded />
                   {scoreData.description !== 'Score baixo, precisa de atenção' && (
                     <p className="text-xs text-muted-foreground">{scoreData.description}</p>
                   )}
@@ -2452,7 +2452,7 @@ Todos os direitos reservados.`;
                  </div>
                </CardHeader>
                  <CardContent className="p-2 pt-0">
-                  <ScoreGaugeCard title="CSB8 [SCORE]" score={result.csb8} faixa={result.csb8_faixa} icon="chart" compact />
+                   <ScoreGaugeCard title="CSB8 [SCORE]" score={result.csb8} faixa={result.csb8_faixa} icon="chart" compact embedded />
                </CardContent>
              </Card>
 
@@ -2498,7 +2498,7 @@ Todos os direitos reservados.`;
                  </div>
                </CardHeader>
                  <CardContent className="p-2 pt-0">
-                  <ScoreGaugeCard title="CSBA [SCORE]" score={result.csba} faixa={result.csba_faixa} icon="trending" compact />
+                   <ScoreGaugeCard title="CSBA [SCORE]" score={result.csba} faixa={result.csba_faixa} icon="trending" compact embedded />
                </CardContent>
              </Card>
            </section>
