@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ArrowLeft, FileText, RefreshCw } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { consultasCpfHistoryService, type ConsultaCpfHistoryItem } from '@/services/consultasCpfHistoryService';
+import { consultationsService } from '@/services/consultationsService';
+import { toast } from 'sonner';
 
 const formatCPF = (cpf: string) => {
   if (!cpf || cpf === 'CPF consultado') return 'N/A';
@@ -35,6 +37,7 @@ const HistoricoConsultasCpf: React.FC = () => {
   const isMobile = useIsMobile();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<ConsultaCpfHistoryItem[]>([]);
+  const [openingId, setOpeningId] = useState<number | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -56,7 +59,36 @@ const HistoricoConsultasCpf: React.FC = () => {
   }, []);
 
   const total = items.length;
-  const totalCompleted = useMemo(() => items.filter((i) => i.status === 'completed').length, [items]);
+
+  const openConsultation = async (item: ConsultaCpfHistoryItem) => {
+    // Recarregar do banco (API) e abrir na tela de consulta SEM cobrar
+    setOpeningId(item.id);
+    try {
+      const res = await consultationsService.getById(item.id);
+
+      if (!res.success || !res.data) {
+        toast.error(res.message || res.error || 'Não foi possível carregar a consulta');
+        return;
+      }
+
+      const consultationData = (res.data as any).result_data ?? res.data;
+      const cpf = (res.data as any).document ?? item.document;
+
+      navigate('/dashboard/consultar-cpf-puxa-tudo', {
+        state: {
+          fromHistory: true,
+          consultationData,
+          cpf,
+          noCharge: true,
+        },
+      });
+    } catch (e) {
+      console.error('❌ [HIST_CPF] Erro ao abrir consulta:', e);
+      toast.error('Erro ao abrir consulta');
+    } finally {
+      setOpeningId(null);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -70,8 +102,10 @@ const HistoricoConsultasCpf: React.FC = () => {
               </CardTitle>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 <Badge variant="secondary">{total} registros</Badge>
-                <Badge variant="secondary">{totalCompleted} concluídas</Badge>
               </div>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Toque em um registro para recarregar do banco e abrir sem cobrança.
+              </p>
             </div>
 
             <div className="flex items-center gap-2">
@@ -79,7 +113,7 @@ const HistoricoConsultasCpf: React.FC = () => {
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Voltar
               </Button>
-              <Button variant="ghost" size="sm" onClick={load} disabled={loading} className="h-9 w-9 p-0">
+              <Button variant="ghost" size="sm" onClick={load} disabled={loading} className="h-9 w-9 p-0" aria-label="Atualizar">
                 <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
               </Button>
             </div>
@@ -97,25 +131,47 @@ const HistoricoConsultasCpf: React.FC = () => {
             </div>
           ) : isMobile ? (
             <div className="space-y-2">
-              {items.map((item) => (
-                <div key={`${item.source_table}-${item.id}`} className="rounded-md border border-border bg-card px-3 py-2">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="font-mono text-xs truncate">{formatCPF(item.document)}</div>
-                      <div className="text-xs text-muted-foreground mt-0.5">{formatFullDate(item.created_at)}</div>
+              {items.map((item) => {
+                const isOpening = openingId === item.id;
+
+                return (
+                  <button
+                    key={`${item.source_table}-${item.id}`}
+                    type="button"
+                    onClick={() => openConsultation(item)}
+                    disabled={openingId !== null}
+                    className="w-full text-left rounded-lg border border-border bg-card px-3 py-3 disabled:opacity-60"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={
+                              item.status === 'completed'
+                                ? 'inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-success'
+                                : 'inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-muted'
+                            }
+                            aria-label={item.status === 'completed' ? 'Concluída' : item.status}
+                            title={item.status === 'completed' ? 'Concluída' : item.status}
+                          />
+                          <div className="font-mono text-xs truncate">{formatCPF(item.document)}</div>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1">{formatFullDate(item.created_at)}</div>
+                      </div>
+
+                      {isOpening ? (
+                        <div className="mt-0.5 animate-spin rounded-full h-4 w-4 border-b-2 border-primary" />
+                      ) : (
+                        <div className="text-right">
+                          <div className="text-xs font-medium text-destructive">{formatCurrency(Number(item.cost) || 0)}</div>
+                          <div className="text-[11px] text-muted-foreground mt-0.5">abrir</div>
+                        </div>
+                      )}
                     </div>
-                    <span
-                      className={
-                        item.status === 'completed'
-                          ? 'mt-0.5 inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-success'
-                          : 'mt-0.5 inline-flex h-2.5 w-2.5 flex-shrink-0 rounded-full bg-muted'
-                      }
-                      aria-label={item.status === 'completed' ? 'Concluída' : item.status}
-                      title={item.status === 'completed' ? 'Concluída' : item.status}
-                    />
-                  </div>
-                </div>
-              ))}
+                  </button>
+                );
+              })}
+
             </div>
           ) : (
             <Table>
@@ -129,7 +185,11 @@ const HistoricoConsultasCpf: React.FC = () => {
               </TableHeader>
               <TableBody>
                 {items.map((item) => (
-                  <TableRow key={`${item.source_table}-${item.id}`}>
+                  <TableRow
+                    key={`${item.source_table}-${item.id}`}
+                    className="cursor-pointer"
+                    onClick={() => openConsultation(item)}
+                  >
                     <TableCell className="font-mono text-sm whitespace-nowrap">{formatCPF(item.document)}</TableCell>
                     <TableCell className="text-sm whitespace-nowrap">{formatFullDate(item.created_at)}</TableCell>
                     <TableCell className="text-right text-sm font-medium text-destructive whitespace-nowrap">
