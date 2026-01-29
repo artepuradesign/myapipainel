@@ -79,6 +79,14 @@ import { atitoConsultaCpfService } from '@/services/atitoConsultaCpfService';
 import SectionActionButtons from '@/components/dashboard/SectionActionButtons';
 import PisSection from '@/components/dashboard/PisSection';
 import ScrollToTop from '@/components/ui/scroll-to-top';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 
 // Função melhorada para consultar CPF e registrar com debug robusto
 const consultarCPFComRegistro = async (cpf: string, cost: number, metadata: any) => {
@@ -714,16 +722,27 @@ const ConsultarCpfPuxaTudo = () => {
     };
   };
 
-  // Carregar últimas 5 consultas CPF para exibir na seção de histórico
-  const loadRecentConsultations = async () => {
+  const RECENT_CONSULTATIONS_PAGE_SIZE = 10;
+  const [recentConsultationsPage, setRecentConsultationsPage] = useState(1);
+  const [recentConsultationsHasNext, setRecentConsultationsHasNext] = useState(false);
+
+  // Carregar últimas consultas CPF para exibir na seção (paginado no backend)
+  const loadRecentConsultations = async (page: number = 1) => {
     if (!user) return;
     
     try {
       setRecentConsultationsLoading(true);
-      console.log('📋 [RECENT_CONSULTATIONS] Carregando últimas 5 consultas CPF...');
+      console.log('📋 [RECENT_CONSULTATIONS] Carregando consultas CPF (paginado)...', {
+        page,
+        limit: RECENT_CONSULTATIONS_PAGE_SIZE,
+      });
       
       // Usar o endpoint do consultationApiService para manter consistência com /dashboard/historico
-      const response = await consultationApiService.getConsultationHistory(5, 0);
+      const offset = (page - 1) * RECENT_CONSULTATIONS_PAGE_SIZE;
+      const response = await consultationApiService.getConsultationHistory(
+        RECENT_CONSULTATIONS_PAGE_SIZE,
+        offset
+      );
       
       if (response.success && response.data && Array.isArray(response.data)) {
         // Filtrar apenas consultas CPF e formatar para o ConsultationsSection
@@ -744,14 +763,20 @@ const ConsultarCpfPuxaTudo = () => {
           }));
         
         setRecentConsultations(cpfConsultations);
+        setRecentConsultationsPage(page);
+        // Como o endpoint não retorna total, inferimos o "hasNext" pelo tamanho da página
+        setRecentConsultationsHasNext(cpfConsultations.length === RECENT_CONSULTATIONS_PAGE_SIZE);
         console.log('✅ [RECENT_CONSULTATIONS] Últimas consultas carregadas:', cpfConsultations.length);
       } else {
         console.warn('⚠️ [RECENT_CONSULTATIONS] Nenhuma consulta encontrada');
         setRecentConsultations([]);
+        setRecentConsultationsPage(1);
+        setRecentConsultationsHasNext(false);
       }
     } catch (error) {
       console.error('❌ [RECENT_CONSULTATIONS] Erro ao carregar consultas:', error);
       setRecentConsultations([]);
+      setRecentConsultationsHasNext(false);
     } finally {
       setRecentConsultationsLoading(false);
     }
@@ -766,9 +791,9 @@ const ConsultarCpfPuxaTudo = () => {
       loadModulePrice(); // Carregar preço do módulo ID 83
       
       // Carregar dados em paralelo
-      Promise.all([
+        Promise.all([
         loadConsultationHistory(), // Carregar histórico do banco
-        loadRecentConsultations(), // Carregar últimas 5 consultas para exibir na seção
+          loadRecentConsultations(1), // Carregar últimas consultas (paginado) para exibir na seção
         loadStats() // Carregar estatísticas via API externa
       ]).then(() => {
         console.log('✅ [INIT] Todos os dados foram carregados');
@@ -3030,7 +3055,7 @@ Todos os direitos reservados.`;
           </div>
         </CardHeader>
         <CardContent>
-          {recentConsultationsLoading ? (
+           {recentConsultationsLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
               <span className="ml-3 text-muted-foreground">Carregando consultas...</span>
@@ -3175,7 +3200,61 @@ Todos os direitos reservados.`;
                     </TableBody>
                   </Table>
                 );
-              })()}
+               })()}
+
+               {/* Paginação */}
+               <div className="mt-4 border-t border-border pt-3">
+                 <Pagination>
+                   <PaginationContent>
+                     <PaginationItem>
+                       <PaginationPrevious
+                         href="#"
+                         onClick={(e) => {
+                           e.preventDefault();
+                           if (recentConsultationsLoading) return;
+                           if (recentConsultationsPage <= 1) return;
+                           loadRecentConsultations(recentConsultationsPage - 1);
+                         }}
+                         aria-disabled={recentConsultationsPage <= 1 || recentConsultationsLoading}
+                         className={
+                           recentConsultationsPage <= 1 || recentConsultationsLoading
+                             ? 'pointer-events-none opacity-50'
+                             : undefined
+                         }
+                       />
+                     </PaginationItem>
+
+                     <PaginationItem>
+                       <PaginationLink
+                         href="#"
+                         isActive
+                         size="default"
+                         onClick={(e) => e.preventDefault()}
+                       >
+                         Página {recentConsultationsPage}
+                       </PaginationLink>
+                     </PaginationItem>
+
+                     <PaginationItem>
+                       <PaginationNext
+                         href="#"
+                         onClick={(e) => {
+                           e.preventDefault();
+                           if (recentConsultationsLoading) return;
+                           if (!recentConsultationsHasNext) return;
+                           loadRecentConsultations(recentConsultationsPage + 1);
+                         }}
+                         aria-disabled={!recentConsultationsHasNext || recentConsultationsLoading}
+                         className={
+                           !recentConsultationsHasNext || recentConsultationsLoading
+                             ? 'pointer-events-none opacity-50'
+                             : undefined
+                         }
+                       />
+                     </PaginationItem>
+                   </PaginationContent>
+                 </Pagination>
+               </div>
             </>
           ) : (
             <div className="text-center py-8 text-gray-500 dark:text-gray-400">
@@ -3186,22 +3265,6 @@ Todos os direitos reservados.`;
               <p className="text-sm">
                 Suas consultas realizadas aparecerão aqui
               </p>
-            </div>
-          )}
-          
-          {recentConsultations.length > 0 && (
-            <div className="text-center pt-4 mt-4 border-t border-border">
-              <Button 
-                variant="outline" 
-                size={isMobile ? "sm" : "sm"}
-                onClick={() => navigate('/dashboard/historico-consultas-cpf')}
-                className="text-primary border-primary hover:bg-muted"
-              >
-                <FileText className={`mr-2 ${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
-                <span className={isMobile ? 'text-xs' : 'text-sm'}>
-                  Ver Histórico Completo
-                </span>
-              </Button>
             </div>
           )}
         </CardContent>
