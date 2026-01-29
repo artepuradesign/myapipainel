@@ -59,9 +59,7 @@ const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChang
       `Tipo: ${tel.tipo_texto || '-'}\n` +
       `Classificação: ${tel.classificacao || '-'}\n` +
       `Sigilo: ${tel.sigilo ? 'Sim' : 'Não'}\n` +
-      `Data Inclusão: ${tel.data_inclusao ? formatDateOnly(tel.data_inclusao) : '-'}\n` +
-      `Data Informação: ${tel.data_informacao ? formatDateOnly(tel.data_informacao) : '-'}\n` +
-      `NSU: ${tel.nsu || '-'}`
+      `Data Inclusão: ${tel.data_inclusao ? formatDateOnly(tel.data_inclusao) : '-'}`
     ).join('\n\n');
 
     navigator.clipboard.writeText(dados);
@@ -187,26 +185,6 @@ const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChang
                       <Input
                         id={`dt_inc_${telefone.id}`}
                         value={telefone.data_inclusao ? formatDateOnly(telefone.data_inclusao) : '-'}
-                        disabled
-                        className="bg-muted text-[14px] md:text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`dt_inf_${telefone.id}`}>Data Informação</Label>
-                      <Input
-                        id={`dt_inf_${telefone.id}`}
-                        value={telefone.data_informacao ? formatDateOnly(telefone.data_informacao) : '-'}
-                        disabled
-                        className="bg-muted text-[14px] md:text-sm"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor={`nsu_${telefone.id}`}>NSU</Label>
-                      <Input
-                        id={`nsu_${telefone.id}`}
-                        value={telefone.nsu || '-'}
                         disabled
                         className="bg-muted text-[14px] md:text-sm"
                       />
