@@ -1,9 +1,10 @@
-import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import React, { useMemo, useState, forwardRef, useImperativeHandle } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Camera, X, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const API_BASE_URL = 'https://api.artepuradesign.com.br';
 const MAX_PHOTOS = 4;
@@ -26,6 +27,8 @@ interface MultiplePhotosUploadProps {
 
 const MultiplePhotosUpload = forwardRef<MultiplePhotosUploadRef, MultiplePhotosUploadProps>(
   ({ cpf, initialPhotos = [] }, ref) => {
+    const isMobile = useIsMobile();
+
     const [photos, setPhotos] = useState<PhotoData[]>(() => {
       // Sempre iniciar com 2 espaços vazios para fotos
       const initial: PhotoData[] = initialPhotos.slice(0, MAX_PHOTOS).map(photo => ({
@@ -41,6 +44,15 @@ const MultiplePhotosUpload = forwardRef<MultiplePhotosUploadRef, MultiplePhotosU
       
       return initial;
     });
+
+    const filledPhotosCount = useMemo(() => {
+      return photos.filter((p) => Boolean(p.preview || p.uploaded || p.file)).length;
+    }, [photos]);
+
+    // Regra: em mobile, quando houver no máximo 2 fotos preenchidas, exibir só os 2 primeiros slots.
+    // Se houver mais de 2 fotos, exibir tudo.
+    const shouldLimitToTwoSlotsOnMobile = isMobile && filledPhotosCount <= 2;
+    const visiblePhotos = shouldLimitToTwoSlotsOnMobile ? photos.slice(0, 2) : photos;
 
     const handleFileSelect = (index: number, file: File) => {
       if (!file) return;
@@ -142,7 +154,7 @@ const MultiplePhotosUpload = forwardRef<MultiplePhotosUploadRef, MultiplePhotosU
     return (
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {photos.map((photoData, index) => (
+          {visiblePhotos.map((photoData, index) => (
             <div key={index} className="space-y-2">
               <Label>Foto {index + 1}</Label>
               <div className="relative">
