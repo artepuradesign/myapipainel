@@ -578,26 +578,9 @@ const ConsultarCpfPuxaTudo = () => {
   const [cpf, setCpf] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CPFResult | null>(null);
-  const [fotosCount, setFotosCount] = useState(0);
   const [telefonesCount, setTelefonesCount] = useState(0);
   const [emailsCount, setEmailsCount] = useState(0);
   const [enderecosCount, setEnderecosCount] = useState(0);
-  const [parentesCount, setParentesCount] = useState(0);
-  const [cnsCount, setCnsCount] = useState(0);
-  const [vacinasCount, setVacinasCount] = useState(0);
-  const [empresasSocioCount, setEmpresasSocioCount] = useState(0);
-  const [cnpjMeiCount, setCnpjMeiCount] = useState(0);
-  const [dividasAtivasCount, setDividasAtivasCount] = useState(0);
-  const [certidaoNascimentoCount, setCertidaoNascimentoCount] = useState(0);
-  const [documentoCount, setDocumentoCount] = useState(0);
-  const [inssCount, setInssCount] = useState(0);
-  const [claroCount, setClaroCount] = useState(0);
-  const [vivoCount, setVivoCount] = useState(0);
-  const [timCount, setTimCount] = useState(0);
-  const [oiCount, setOiCount] = useState(0);
-  const [senhaEmailCount, setSenhaEmailCount] = useState(0);
-  const [senhaCpfCount, setSenhaCpfCount] = useState(0);
-  const [gestaoCount, setGestaoCount] = useState(0);
   const [receitaData, setReceitaData] = useState<BaseReceita | null>(null);
   const [queryHistory, setQueryHistory] = useState<any[]>([]);
   const [recentConsultations, setRecentConsultations] = useState<any[]>([]);
@@ -2226,38 +2209,9 @@ Todos os direitos reservados.`;
           result.uf_emissao,
           result.data_obito,
           result.renda,
-          result.titulo_eleitor,
         ].some(hasValue);
 
-        const hasTituloEleitor = [
-          result.titulo_eleitor,
-          result.zona,
-          result.secao,
-        ].some(hasValue);
-
-        // (incompleta) — por enquanto, consideramos “tem dados” se algum campo financeiro vier preenchido
-        const hasDadosFinanceiros = [
-          result.aposentado,
-          result.tipo_emprego,
-          result.cbo,
-          result.poder_aquisitivo,
-          result.renda,
-          result.fx_poder_aquisitivo,
-        ].some(hasValue);
-
-        const scoreCount = Number(result.score) > 0 ? 1 : 0;
-        const csb8Count = (hasValue(result.csb8) || hasValue(result.csb8_faixa)) ? 1 : 0;
-        const csbaCount = (hasValue(result.csba) || hasValue(result.csba_faixa)) ? 1 : 0;
-        const dadosFinanceirosCount = hasDadosFinanceiros ? 1 : 0;
         const dadosBasicosCount = hasDadosBasicos ? 1 : 0;
-        const tituloEleitorCount = hasTituloEleitor ? 1 : 0;
-
-        const pisCount = (() => {
-          const v = (result.pis ?? '').toString().trim();
-          const upper = v.toUpperCase();
-          if (!v || upper === '-' || upper === 'SEM RESULTADO' || upper === 'SEM DADOS') return 0;
-          return 1;
-        })();
 
         // Quando houver dados, usamos destaque sólido (sem transparência)
         const onlineCardClass = (hasData: boolean) =>
@@ -2294,67 +2248,17 @@ Todos os direitos reservados.`;
                 // Exibir somente as sessões marcadas como "Online" (atalhos do topo),
                 // mantendo a mesma ordem em que as seções aparecem na página.
                  const onlineBadges = [
-                    { href: '#fotos-section', label: 'Fotos' },
-                    { href: '#score-section', label: 'Score' },
-                    { href: '#csb8-section', label: 'CSB8' },
-                    { href: '#csba-section', label: 'CSBA' },
-                   { href: '#dados-financeiros-section', label: 'Dados Financeiros' },
-                  { href: '#dados-basicos-section', label: 'Dados Básicos' },
-                  { href: '#telefones-section', label: 'Telefones' },
-                  { href: '#emails-section', label: 'Emails' },
-                  { href: '#enderecos-section', label: 'Endereços' },
-                  { href: '#titulo-eleitor-section', label: 'Título de Eleitor' },
-                  { href: '#parentes-section', label: 'Parentes' },
-                  { href: '#certidao-nascimento-section', label: 'Certidão de Nascimento' },
-                  { href: '#documento-section', label: 'Documento' },
-                  { href: '#cns-section', label: 'CNS' },
-                  { href: '#pis-section', label: 'PIS' },
-                  { href: '#vacinas-section', label: 'Vacinas' },
-                  { href: '#empresas-socio-section', label: 'Empresas Associadas (SÓCIO)' },
-                  { href: '#cnpj-mei-section', label: 'CNPJ MEI' },
-                  { href: '#dividas-ativas-section', label: 'Dívidas Ativas (SIDA)' },
-                  { href: '#auxilio-emergencial-section', label: 'Auxílio Emergencial' },
-                  { href: '#rais-section', label: 'Rais - Histórico de Emprego' },
-                  { href: '#inss-section', label: 'INSS' },
-                  { href: '#claro-section', label: 'Operadora Claro' },
-                  { href: '#vivo-section', label: 'Operadora Vivo' },
-                  { href: '#tim-section', label: 'Operadora TIM' },
-                  { href: '#oi-section', label: 'Operadora OI' },
-                  { href: '#senhas-email-section', label: 'Senhas de Email' },
-                  { href: '#senhas-cpf-section', label: 'Senhas de CPF' },
-                  { href: '#gestao-cadastral-section', label: 'Gestão Cadastral' },
+                    { href: '#dados-basicos-section', label: 'Dados Básicos' },
+                    { href: '#telefones-section', label: 'Telefones' },
+                    { href: '#emails-section', label: 'Emails' },
+                    { href: '#enderecos-section', label: 'Endereços' },
                 ] as const;
 
                  const badgeCounts: Record<string, number> = {
-                   '#fotos-section': fotosCount,
-                    '#score-section': scoreCount,
-                    '#csb8-section': csb8Count,
-                    '#csba-section': csbaCount,
-                    '#dados-financeiros-section': dadosFinanceirosCount,
                     '#dados-basicos-section': dadosBasicosCount,
                    '#telefones-section': telefonesCount,
                    '#emails-section': emailsCount,
                    '#enderecos-section': enderecosCount,
-                    '#titulo-eleitor-section': tituloEleitorCount,
-                   '#parentes-section': parentesCount,
-                    '#certidao-nascimento-section': certidaoNascimentoCount,
-                    '#documento-section': documentoCount,
-                   '#cns-section': cnsCount,
-                    '#pis-section': pisCount,
-                   '#vacinas-section': vacinasCount,
-                   '#empresas-socio-section': empresasSocioCount,
-                   '#cnpj-mei-section': cnpjMeiCount,
-                   '#dividas-ativas-section': dividasAtivasCount,
-                   '#auxilio-emergencial-section': auxiliosEmergenciais?.length ?? 0,
-                   '#rais-section': rais?.length ?? 0,
-                   '#inss-section': inssCount,
-                   '#claro-section': claroCount,
-                   '#vivo-section': vivoCount,
-                   '#tim-section': timCount,
-                   '#oi-section': oiCount,
-                   '#senhas-email-section': senhaEmailCount,
-                   '#senhas-cpf-section': senhaCpfCount,
-                   '#gestao-cadastral-section': gestaoCount,
                  };
 
                 const badgeClassName =
@@ -2388,236 +2292,7 @@ Todos os direitos reservados.`;
             </CardContent>
           </Card>
 
-          {/* Fotos - Usando FotosSection para consistência */}
-          <div id="fotos-section">
-            <FotosSection cpfId={result.id} cpfNumber={result.cpf} onCountChange={setFotosCount} />
-          </div>
-
-           {/* Score + CSB8 + CSBA (responsivo e compacto) */}
-           <section className="mx-auto w-full max-w-6xl grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
-             <Card id="score-section" className={onlineCardClass(hasValue(result.score))}>
-                  <CardContent className="p-2 space-y-1">
-                    <ScoreGaugeCard
-                      title="SCORE"
-                      score={result.score}
-                      faixa={scoreData.label}
-                      icon="chart"
-                      compact
-                      embedded
-                      headerRight={
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              const dados = [
-                                `SCORE: ${result.score || '-'}`,
-                                `FAIXA: ${scoreData.label || '-'}`,
-                              ].join('\n');
-                              navigator.clipboard.writeText(dados);
-                              toast.success('Score copiado!');
-                            }}
-                            className="h-7 w-7"
-                            title="Copiar dados da seção"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-
-                          <div className="relative inline-flex">
-                            <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
-                              Online
-                            </Badge>
-                            {scoreCount > 0 ? (
-                              <span
-                                className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                                aria-label={`Quantidade de registros Score: ${scoreCount}`}
-                              >
-                                {scoreCount}
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
-                      }
-                    />
-                  {scoreData.description !== 'Score baixo, precisa de atenção' && (
-                    <p className="text-xs text-muted-foreground">{scoreData.description}</p>
-                  )}
-               </CardContent>
-             </Card>
-
-             <Card id="csb8-section" className={onlineCardClass(hasValue(result.csb8) || hasValue(result.csb8_faixa))}>
-                  <CardContent className="p-2">
-                    <ScoreGaugeCard
-                      title="CSB8 [SCORE]"
-                      score={result.csb8}
-                      faixa={result.csb8_faixa}
-                      icon="chart"
-                      compact
-                      embedded
-                      headerRight={
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              const dados = [
-                                `CSB8: ${result.csb8 || '-'}`,
-                                `FAIXA: CSB8 [SCORE]: ${result.csb8_faixa || '-'}`,
-                              ].join('\n');
-                              navigator.clipboard.writeText(dados);
-                              toast.success('CSB8 copiado!');
-                            }}
-                            className="h-7 w-7"
-                            title="Copiar dados da seção"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-
-                          <div className="relative inline-flex">
-                            <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
-                              Online
-                            </Badge>
-                            {csb8Count > 0 ? (
-                              <span
-                                className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                                aria-label={`Quantidade de registros CSB8: ${csb8Count}`}
-                              >
-                                {csb8Count}
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
-                      }
-                    />
-               </CardContent>
-             </Card>
-
-             <Card id="csba-section" className={onlineCardClass(hasValue(result.csba) || hasValue(result.csba_faixa))}>
-                  <CardContent className="p-2">
-                    <ScoreGaugeCard
-                      title="CSBA [SCORE]"
-                      score={result.csba}
-                      faixa={result.csba_faixa}
-                      icon="trending"
-                      compact
-                      embedded
-                      headerRight={
-                        <div className="flex items-center gap-2">
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => {
-                              const dados = [
-                                `CSBA: ${result.csba || '-'}`,
-                                `FAIXA: CSBA [SCORE]: ${result.csba_faixa || '-'}`,
-                              ].join('\n');
-                              navigator.clipboard.writeText(dados);
-                              toast.success('CSBA copiado!');
-                            }}
-                            className="h-7 w-7"
-                            title="Copiar dados da seção"
-                          >
-                            <Copy className="h-4 w-4" />
-                          </Button>
-
-                          <div className="relative inline-flex">
-                            <Badge variant="secondary" className="uppercase tracking-wide text-[9px]">
-                              Online
-                            </Badge>
-                            {csbaCount > 0 ? (
-                              <span
-                                className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                                aria-label={`Quantidade de registros CSBA: ${csbaCount}`}
-                              >
-                                {csbaCount}
-                              </span>
-                            ) : null}
-                          </div>
-                        </div>
-                      }
-                    />
-               </CardContent>
-             </Card>
-           </section>
-
-          {/* Dados Financeiros */}
-          <Card id="dados-financeiros-section" className={onlineCardClass(hasDadosFinanceiros)}>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg lg:text-xl">
-                  <DollarSign className="h-5 w-5" />
-                  Dados Financeiros
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      const dados = [
-                        `Poder Aquisitivo: ${result.poder_aquisitivo || '-'}`,
-                        `Renda: ${formatRenda(result.renda) || '-'}`,
-                        `Faixa Poder Aquisitivo: ${result.fx_poder_aquisitivo || '-'}`,
-                      ].join('\n');
-                      navigator.clipboard.writeText(dados);
-                      toast.success('Dados financeiros copiados!');
-                    }}
-                    className="h-8 w-8"
-                    title="Copiar dados da seção"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-
-                  <div className="relative inline-flex">
-                    <Badge variant="secondary" className="uppercase tracking-wide">
-                      Online
-                    </Badge>
-                    {dadosFinanceirosCount > 0 ? (
-                      <span
-                        className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                        aria-label={`Quantidade de registros Dados Financeiros: ${dadosFinanceirosCount}`}
-                      >
-                        {dadosFinanceirosCount}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {/* Outros dados financeiros */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pt-4 border-t border-border">
-                <div>
-                  <Label htmlFor="poder_aquisitivo">Poder Aquisitivo</Label>
-                  <Input
-                    id="poder_aquisitivo"
-                    value={result.poder_aquisitivo || ''}
-                    disabled
-                    className="uppercase text-[14px] md:text-sm"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="renda">Renda</Label>
-                  <Input
-                    id="renda"
-                    value={formatRenda(result.renda)}
-                    disabled
-                    className="text-[14px] md:text-sm"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="fx_poder_aquisitivo">Faixa Poder Aquisitivo</Label>
-                  <Input
-                    id="fx_poder_aquisitivo"
-                    value={result.fx_poder_aquisitivo || ''}
-                    disabled
-                    className="uppercase text-[14px] md:text-sm"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          {/* (Simplificado) — exibimos somente Dados Básicos, Telefones, Emails e Endereços */}
 
           {/* Dados Básicos */}
           <Card id="dados-basicos-section" className={onlineCardClass(hasDadosBasicos) ? `w-full ${onlineCardClass(hasDadosBasicos)}` : "w-full"}>
@@ -2646,7 +2321,6 @@ Todos os direitos reservados.`;
                         `UF Emissor: ${result.uf_emissao || '-'}`,
                         `Data de Óbito: ${result.data_obito ? new Date(result.data_obito).toLocaleDateString('pt-BR') : '-'}`,
                         `Renda: ${formatRenda(result.renda) || '-'}`,
-                        `Título de Eleitor: ${result.titulo_eleitor || '-'}`,
                       ].join('\n');
                       navigator.clipboard.writeText(dados);
                       toast.success('Dados básicos copiados!');
@@ -2831,17 +2505,6 @@ Todos os direitos reservados.`;
                 </div>
                 ) : null}
 
-                {result.titulo_eleitor ? (
-                <div>
-                  <Label className="text-xs sm:text-sm" htmlFor="titulo_eleitor_basicos">Título de Eleitor</Label>
-                  <Input
-                    id="titulo_eleitor_basicos"
-                    value={result.titulo_eleitor || ''}
-                    disabled
-                     className="bg-muted uppercase text-[14px] md:text-sm"
-                  />
-                </div>
-                ) : null}
               </div>
             </CardContent>
           </Card>
@@ -2860,195 +2523,6 @@ Todos os direitos reservados.`;
            <div id="enderecos-section">
               <EnderecosSection cpfId={result.id} onCountChange={setEnderecosCount} />
            </div>
-
-          {/* Título de Eleitor */}
-          <Card id="titulo-eleitor-section" className={onlineCardClass(hasTituloEleitor)}>
-            <CardHeader className="p-4 md:p-6">
-              <div className="flex items-center justify-between gap-3">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg lg:text-xl truncate">
-                  <FileText className="h-5 w-5" />
-                  Título de Eleitor
-                </CardTitle>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => {
-                      const dados = [
-                        `Título de Eleitor: ${result.titulo_eleitor || '-'}`,
-                        `Zona: ${result.zona || '-'}`,
-                        `Seção: ${result.secao || '-'}`,
-                      ].join('\n');
-                      navigator.clipboard.writeText(dados);
-                      toast.success('Título de eleitor copiado!');
-                    }}
-                    className="h-8 w-8"
-                    title="Copiar dados da seção"
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-
-                  <div className="relative inline-flex">
-                    <Badge variant="secondary" className="uppercase tracking-wide">
-                      Online
-                    </Badge>
-                    {tituloEleitorCount > 0 ? (
-                      <span
-                        className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                        aria-label={`Quantidade de registros Título de Eleitor: ${tituloEleitorCount}`}
-                      >
-                        {tituloEleitorCount}
-                      </span>
-                    ) : null}
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4 p-4 md:p-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <Label className="text-xs sm:text-sm" htmlFor="titulo_eleitor">Título de Eleitor</Label>
-                  <Input
-                    id="titulo_eleitor"
-                    value={result.titulo_eleitor || ''}
-                    disabled
-                    className="bg-muted uppercase text-[14px] md:text-sm"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs sm:text-sm" htmlFor="zona">Zona</Label>
-                  <Input
-                    id="zona"
-                    value={result.zona || ''}
-                    disabled
-                    className="bg-muted text-[14px] md:text-sm"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs sm:text-sm" htmlFor="secao">Seção</Label>
-                  <Input
-                    id="secao"
-                    value={result.secao || ''}
-                    disabled
-                    className="bg-muted text-[14px] md:text-sm"
-                  />
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Parentes */}
-          <div id="parentes-section">
-            <ParentesSection cpfId={result.id} onCountChange={setParentesCount} />
-          </div>
-
-          {/* Cônjuge */}
-          <PlaceholderSection title="Cônjuge" icon={Heart} />
-
-          {/* Certidão de Nascimento */}
-          <div id="certidao-nascimento-section">
-            <CertidaoNascimentoSection cpfId={result.id} onCountChange={setCertidaoNascimentoCount} />
-          </div>
-
-          {/* Documento */}
-          <div id="documento-section">
-            <DocumentoSection cpfId={result.id} onCountChange={setDocumentoCount} />
-          </div>
-
-          {/* CNS */}
-          <div id="cns-section">
-            <CnsSection cpfId={result.id} onCountChange={setCnsCount} />
-          </div>
-
-          {/* PIS */}
-          <div id="pis-section">
-            <PisSection pis={result.pis} />
-          </div>
-
-          {/* Histórico de Veículos */}
-          <HistoricoVeiculoSection cpfId={result.id} />
-
-          {/* Últimos Veículos */}
-          <PlaceholderSection title="Últimos Veículos" icon={Globe} />
-
-
-
-          {/* Covid */}
-          <div id="vacinas-section">
-            <VacinaDisplay cpfId={result.id} onCountChange={setVacinasCount} />
-          </div>
-
-          {/* Empresas Associadas (SÓCIO) */}
-          <div id="empresas-socio-section">
-            <EmpresasSocioSection cpfId={result.id} onCountChange={setEmpresasSocioCount} />
-          </div>
-
-          {/* CNPJ MEI */}
-          <div id="cnpj-mei-section">
-            <CnpjMeiSection cpfId={result.id} onCountChange={setCnpjMeiCount} />
-          </div>
-
-          {/* Dívidas Ativas (SIDA) */}
-          <div id="dividas-ativas-section">
-            <DividasAtivasSection cpf={result.id.toString()} onCountChange={setDividasAtivasCount} />
-          </div>
-
-          {/* Auxílio Emergencial */}
-          <div id="auxilio-emergencial-section">
-            <AuxilioEmergencialSection auxilios={auxiliosEmergenciais} />
-          </div>
-
-          {/* Rais - Histórico de Emprego */}
-          <div id="rais-section">
-            <RaisSection data={rais} isLoading={raisLoading} />
-          </div>
-
-          {/* INSS */}
-          <div id="inss-section">
-            <InssSection cpfId={result.id} onCountChange={setInssCount} />
-          </div>
-
-          {/* Operadora Claro */}
-          <div id="claro-section">
-            <ClaroSection cpfId={result.id} onCountChange={setClaroCount} />
-          </div>
-
-          {/* Operadora Vivo */}
-          <div id="vivo-section">
-            <VivoSection cpfId={result.id} onCountChange={setVivoCount} />
-          </div>
-
-          {/* Operadora Tim */}
-          <div id="tim-section">
-            <OperadoraTimSection cpfId={result.id} onCountChange={setTimCount} />
-          </div>
-
-          {/* Operadora OI */}
-          <div id="oi-section">
-            <OperadoraOiSection cpfId={result.id} onCountChange={setOiCount} />
-          </div>
-
-          {/* Senhas de Email */}
-          <div id="senhas-email-section">
-            <SenhaEmailSection cpfId={result.id} onCountChange={setSenhaEmailCount} />
-          </div>
-
-          {/* Senhas do CPF */}
-          <div id="senhas-cpf-section">
-            <SenhaCpfSection cpfId={result.id} onCountChange={setSenhaCpfCount} />
-          </div>
-
-          {/* (Removido) Documento/RG, CNH e NIS conforme solicitado */}
-
-          {/* Boletim de Ocorrência */}
-          <BoletimOcorrenciaSection cpfId={result.id} />
-
-          {/* Gestão Cadastral */}
-          <div id="gestao-cadastral-section">
-            <GestaoSection cpfId={result.id} onCountChange={setGestaoCount} />
-          </div>
-
-
         </div>
         );
       })()}
