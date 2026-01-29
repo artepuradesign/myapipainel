@@ -48,7 +48,26 @@ const SimpleTitleBar = ({
     return match?.title?.toString().trim() || "";
   }, [modules, normalizedPath]);
 
+  const moduleDescription = useMemo(() => {
+    const normalizeModuleRoute = (module: any): string => {
+      const raw = (module?.api_endpoint || module?.path || "").toString().trim();
+      if (!raw) return "";
+      if (raw.startsWith("/")) return raw;
+      if (raw.startsWith("dashboard/")) return `/${raw}`;
+      if (!raw.includes("/")) return `/dashboard/${raw}`;
+      return raw;
+    };
+
+    const match = (modules || []).find((m: any) => {
+      const route = normalizeModuleRoute(m);
+      return route && route === normalizedPath;
+    });
+
+    return match?.description?.toString().trim() || "";
+  }, [modules, normalizedPath]);
+
   const displayTitle = moduleTitle || title;
+  const displaySubtitle = moduleDescription || subtitle;
 
   return (
     <Card>
@@ -59,9 +78,9 @@ const SimpleTitleBar = ({
               {icon ? <span className="shrink-0 text-primary">{icon}</span> : null}
               <span className="truncate">{displayTitle}</span>
             </CardTitle>
-            {subtitle ? (
+            {displaySubtitle ? (
               <p className="text-xs md:text-sm text-muted-foreground mt-1 line-clamp-2 md:line-clamp-none">
-                {subtitle}
+                {displaySubtitle}
               </p>
             ) : null}
           </div>
