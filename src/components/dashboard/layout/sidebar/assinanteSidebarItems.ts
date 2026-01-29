@@ -55,6 +55,11 @@ export const createAssinanteSidebarItems = (handleLogout: () => void, panelMenus
           icon: MessageSquare,
           label: 'Suporte',
           path: '/dashboard/suporte'
+        },
+        {
+          icon: History,
+          label: 'Histórico',
+          path: '/dashboard/historico'
         }
       ]
     },
@@ -64,11 +69,6 @@ export const createAssinanteSidebarItems = (handleLogout: () => void, panelMenus
       label: 'Painéis Disponíveis',
       path: '#',
       subItems: panelMenus
-    },
-    {
-      icon: History,
-      label: 'Histórico',
-      path: '/dashboard/historico'
     },
     {
       icon: LayoutDashboard,
