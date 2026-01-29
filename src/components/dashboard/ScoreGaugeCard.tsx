@@ -10,6 +10,7 @@
    icon?: 'chart' | 'trending';
   compact?: boolean;
   embedded?: boolean;
+  headerRight?: React.ReactNode;
  }
  
  const ScoreGaugeCard: React.FC<ScoreGaugeCardProps> = ({ 
@@ -20,6 +21,7 @@
   icon = 'chart',
   compact = false,
   embedded = false,
+  headerRight,
  }) => {
    // Converter score para número
    const numericScore = typeof score === 'string' ? parseFloat(score) : (score || 0);
@@ -55,11 +57,17 @@
     <Root className={rootClassName}>
       <div className={pad}>
          {/* Header */}
-        <div className={`flex items-center gap-2 ${headerGap}`}>
-          <IconComponent className={`${iconSize} ${colors.text}`} />
-          <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground">
-             {title}
-           </h3>
+         <div className={`flex items-center justify-between gap-3 ${headerGap}`}>
+           <div className="flex items-center gap-2 min-w-0">
+             <IconComponent className={`${iconSize} ${colors.text}`} />
+             <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground truncate">
+               {title}
+             </h3>
+           </div>
+
+           {headerRight ? (
+             <div className="shrink-0">{headerRight}</div>
+           ) : null}
          </div>
          
          {/* Gauge Chart */}
