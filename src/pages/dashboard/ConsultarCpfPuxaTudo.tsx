@@ -3020,7 +3020,7 @@ Todos os direitos reservados.`;
       })()}
 
       {/* Últimas Consultas CPF */}
-      <Card className="dark:bg-gray-800 dark:border-gray-700 w-full">
+      <Card className="w-full">
         <CardHeader className="pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <CardTitle className={`flex items-center ${isMobile ? 'text-base' : 'text-lg sm:text-xl lg:text-2xl'}`}>
@@ -3125,7 +3125,14 @@ Todos os direitos reservados.`;
                           R$ {numericValue.toFixed(2).replace('.', ',')}
                         </TableCell>
                         <TableCell className="text-center">
-                          <Badge variant={consultation.status === 'completed' ? 'default' : 'secondary'} className="text-xs rounded-full">
+                          <Badge
+                            variant={consultation.status === 'completed' ? 'secondary' : 'outline'}
+                            className={
+                              consultation.status === 'completed'
+                                ? 'text-xs rounded-full bg-foreground text-background hover:bg-foreground/90'
+                                : 'text-xs rounded-full'
+                            }
+                          >
                             {consultation.status === 'completed' ? 'Concluída' : 'Pendente'}
                           </Badge>
                         </TableCell>
@@ -3148,7 +3155,7 @@ Todos os direitos reservados.`;
           )}
           
           {recentConsultations.length > 0 && (
-            <div className="text-center pt-4 mt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="text-center pt-4 mt-4 border-t border-border">
               <Button 
                 variant="outline" 
                 size={isMobile ? "sm" : "sm"}
