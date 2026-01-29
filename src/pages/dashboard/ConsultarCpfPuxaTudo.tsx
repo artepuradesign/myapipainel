@@ -2368,7 +2368,9 @@ Todos os direitos reservados.`;
                </CardHeader>
                <CardContent className="p-4 pt-0 space-y-2">
                  <ScoreGaugeCard title="SCORE" score={result.score} faixa={scoreData.label} icon="chart" />
-                 <p className="text-xs text-muted-foreground">{scoreData.description}</p>
+                  {scoreData.description !== 'Score baixo, precisa de atenção' && (
+                    <p className="text-xs text-muted-foreground">{scoreData.description}</p>
+                  )}
                </CardContent>
              </Card>
 
