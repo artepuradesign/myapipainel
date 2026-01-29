@@ -9,6 +9,7 @@
    maxScore?: number;
    icon?: 'chart' | 'trending';
   compact?: boolean;
+  embedded?: boolean;
  }
  
  const ScoreGaugeCard: React.FC<ScoreGaugeCardProps> = ({ 
@@ -17,7 +18,8 @@
    faixa, 
    maxScore = 1000,
   icon = 'chart',
-  compact = false
+  compact = false,
+  embedded = false,
  }) => {
    // Converter score para número
    const numericScore = typeof score === 'string' ? parseFloat(score) : (score || 0);
@@ -37,15 +39,20 @@
    
    const IconComponent = icon === 'trending' ? TrendingUp : BarChart3;
 
-  const pad = compact ? 'p-4' : 'p-6';
-  const gaugePad = compact ? 'p-4' : 'p-6';
-  const headerGap = compact ? 'mb-3' : 'mb-4';
-  const iconSize = compact ? 'h-4 w-4' : 'h-5 w-5';
-  const scoreSize = compact ? 'text-2xl' : 'text-3xl';
-  const scoreInfoSize = compact ? 'text-xs' : 'text-sm';
+  const pad = compact ? 'p-2' : 'p-6';
+  const gaugePad = compact ? 'p-2' : 'p-6';
+  const headerGap = compact ? 'mb-2' : 'mb-4';
+  const iconSize = compact ? 'h-3.5 w-3.5' : 'h-5 w-5';
+  const scoreSize = compact ? 'text-xl' : 'text-3xl';
+  const scoreInfoSize = compact ? 'text-[11px]' : 'text-sm';
+
+  const Root: React.ElementType = embedded ? 'div' : Card;
+  const rootClassName = embedded
+    ? 'bg-transparent border-0 shadow-none'
+    : 'bg-card text-card-foreground border-border overflow-hidden';
    
    return (
-    <Card className="bg-card text-card-foreground border-border overflow-hidden">
+    <Root className={rootClassName}>
       <div className={pad}>
          {/* Header */}
         <div className={`flex items-center gap-2 ${headerGap}`}>
@@ -57,8 +64,8 @@
          
          {/* Gauge Chart */}
         <div
-          className={`bg-background border border-border rounded-lg ${gaugePad} mb-4 relative`}
-          style={{ aspectRatio: '1/1' }}
+          className={`bg-background border border-border rounded-lg ${gaugePad} mb-2 relative`}
+          style={compact ? { aspectRatio: '16/10' } : { aspectRatio: '1/1' }}
         >
            <svg viewBox="0 0 200 120" className="w-full h-auto">
              {/* Background arcs */}
@@ -113,7 +120,7 @@
            </svg>
            
            {/* Score Display */}
-           <div className="absolute inset-0 flex flex-col items-center justify-end pb-4">
+            <div className={`absolute inset-0 flex flex-col items-center justify-end ${compact ? 'pb-2' : 'pb-4'}`}>
             <div className={`${scoreSize} font-bold text-foreground`}>
                {Math.round(numericScore)}
              </div>
@@ -139,7 +146,7 @@
            </div>
          </div>
        </div>
-     </Card>
+    </Root>
    );
  };
  
