@@ -79,6 +79,7 @@ import { atitoConsultaCpfService } from '@/services/atitoConsultaCpfService';
 import SectionActionButtons from '@/components/dashboard/SectionActionButtons';
 import PisSection from '@/components/dashboard/PisSection';
 import ScrollToTop from '@/components/ui/scroll-to-top';
+import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 
 // Função melhorada para consultar CPF e registrar com debug robusto
 const consultarCPFComRegistro = async (cpf: string, cost: number, metadata: any) => {
@@ -1952,9 +1953,24 @@ Todos os direitos reservados.`;
     );
   }
 
+  const handleBack = () => {
+    // Se o usuário chegou aqui via navegação interna, volta uma tela.
+    // Caso contrário (ex.: abriu direto a URL), volta para o dashboard.
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+    navigate('/dashboard');
+  };
+
   return (
     <div className="space-y-6 max-w-full overflow-x-hidden">
       <div className="w-full max-w-6xl mx-auto">
+        <SimpleTitleBar
+          title="Consulta CPF Simples"
+          onBack={handleBack}
+        />
+
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_380px] gap-4 md:gap-6 lg:gap-8">
         {/* Formulário de Consulta */}
         <Card className="dark:bg-gray-800 dark:border-gray-700 w-full">
