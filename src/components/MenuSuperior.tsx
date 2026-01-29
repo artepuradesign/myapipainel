@@ -101,7 +101,7 @@ const MenuSuperior = () => {
           <div className="flex justify-between items-center h-16">
             {/* Tablet e Desktop - Logo com Theme e Notifications (>=768px) */}
             <div className="hidden md:flex items-center space-x-4">
-              <TextLogo to="/" />
+              <TextLogo to="/dashboard" />
               <div className="flex items-center space-x-2">
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -131,7 +131,7 @@ const MenuSuperior = () => {
           {/* Mobile - Logo compacto (< 768px) */}
           <div className="md:hidden flex items-center gap-2">
             {/* Logo: ícone + texto para não logados, apenas ícone para logados */}
-            <TextLogo to="/" showFullOnMobile={!user} />
+            <TextLogo to="/dashboard" showFullOnMobile={!user} />
             {/* Theme Switcher removido - agora está dentro do UserWalletDropdown */}
           </div>
 
