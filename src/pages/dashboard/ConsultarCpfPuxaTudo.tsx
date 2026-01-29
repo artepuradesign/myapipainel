@@ -586,6 +586,8 @@ const ConsultarCpfPuxaTudo = () => {
   const [empresasSocioCount, setEmpresasSocioCount] = useState(0);
   const [cnpjMeiCount, setCnpjMeiCount] = useState(0);
   const [dividasAtivasCount, setDividasAtivasCount] = useState(0);
+  const [certidaoNascimentoCount, setCertidaoNascimentoCount] = useState(0);
+  const [documentoCount, setDocumentoCount] = useState(0);
   const [inssCount, setInssCount] = useState(0);
   const [claroCount, setClaroCount] = useState(0);
   const [vivoCount, setVivoCount] = useState(0);
@@ -2209,6 +2211,20 @@ Todos os direitos reservados.`;
           result.fx_poder_aquisitivo,
         ].some(hasValue);
 
+        const scoreCount = Number(result.score) > 0 ? 1 : 0;
+        const csb8Count = (hasValue(result.csb8) || hasValue(result.csb8_faixa)) ? 1 : 0;
+        const csbaCount = (hasValue(result.csba) || hasValue(result.csba_faixa)) ? 1 : 0;
+        const dadosFinanceirosCount = hasDadosFinanceiros ? 1 : 0;
+        const dadosBasicosCount = hasDadosBasicos ? 1 : 0;
+        const tituloEleitorCount = hasTituloEleitor ? 1 : 0;
+
+        const pisCount = (() => {
+          const v = (result.pis ?? '').toString().trim();
+          const upper = v.toUpperCase();
+          if (!v || upper === '-' || upper === 'SEM RESULTADO' || upper === 'SEM DADOS') return 0;
+          return 1;
+        })();
+
         // Quando houver dados, usamos destaque sólido (sem transparência)
         const onlineCardClass = (hasData: boolean) =>
           hasData ? "border-success-border bg-success-subtle" : undefined;
@@ -2277,11 +2293,20 @@ Todos os direitos reservados.`;
 
                  const badgeCounts: Record<string, number> = {
                    '#fotos-section': fotosCount,
+                    '#score-section': scoreCount,
+                    '#csb8-section': csb8Count,
+                    '#csba-section': csbaCount,
+                    '#dados-financeiros-section': dadosFinanceirosCount,
+                    '#dados-basicos-section': dadosBasicosCount,
                    '#telefones-section': telefonesCount,
                    '#emails-section': emailsCount,
                    '#enderecos-section': enderecosCount,
+                    '#titulo-eleitor-section': tituloEleitorCount,
                    '#parentes-section': parentesCount,
+                    '#certidao-nascimento-section': certidaoNascimentoCount,
+                    '#documento-section': documentoCount,
                    '#cns-section': cnsCount,
+                    '#pis-section': pisCount,
                    '#vacinas-section': vacinasCount,
                    '#empresas-socio-section': empresasSocioCount,
                    '#cnpj-mei-section': cnpjMeiCount,
@@ -2343,7 +2368,7 @@ Todos os direitos reservados.`;
                      <TrendingUp className="h-4 w-4" />
                      Score
                    </CardTitle>
-                   <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                      <Button
                        variant="ghost"
                        size="icon"
@@ -2361,9 +2386,19 @@ Todos os direitos reservados.`;
                        <Copy className="h-4 w-4" />
                      </Button>
 
-                      <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
-                        Online
-                      </Badge>
+                      <div className="relative inline-flex">
+                        <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                          Online
+                        </Badge>
+                        {scoreCount > 0 ? (
+                          <span
+                            className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                            aria-label={`Quantidade de registros Score: ${scoreCount}`}
+                          >
+                            {scoreCount}
+                          </span>
+                        ) : null}
+                      </div>
                    </div>
                  </div>
                </CardHeader>
@@ -2382,7 +2417,7 @@ Todos os direitos reservados.`;
                      <TrendingUp className="h-4 w-4" />
                      CSB8
                    </CardTitle>
-                   <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                      <Button
                        variant="ghost"
                        size="icon"
@@ -2400,9 +2435,19 @@ Todos os direitos reservados.`;
                        <Copy className="h-4 w-4" />
                      </Button>
 
-                      <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
-                        Online
-                      </Badge>
+                      <div className="relative inline-flex">
+                        <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                          Online
+                        </Badge>
+                        {csb8Count > 0 ? (
+                          <span
+                            className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                            aria-label={`Quantidade de registros CSB8: ${csb8Count}`}
+                          >
+                            {csb8Count}
+                          </span>
+                        ) : null}
+                      </div>
                    </div>
                  </div>
                </CardHeader>
@@ -2418,7 +2463,7 @@ Todos os direitos reservados.`;
                      <TrendingUp className="h-4 w-4" />
                      CSBA
                    </CardTitle>
-                   <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                      <Button
                        variant="ghost"
                        size="icon"
@@ -2436,9 +2481,19 @@ Todos os direitos reservados.`;
                        <Copy className="h-4 w-4" />
                      </Button>
 
-                      <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
-                        Online
-                      </Badge>
+                      <div className="relative inline-flex">
+                        <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                          Online
+                        </Badge>
+                        {csbaCount > 0 ? (
+                          <span
+                            className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                            aria-label={`Quantidade de registros CSBA: ${csbaCount}`}
+                          >
+                            {csbaCount}
+                          </span>
+                        ) : null}
+                      </div>
                    </div>
                  </div>
                </CardHeader>
@@ -2475,9 +2530,19 @@ Todos os direitos reservados.`;
                     <Copy className="h-4 w-4" />
                   </Button>
 
-                  <Badge variant="secondary" className="uppercase tracking-wide">
-                    Online
-                  </Badge>
+                  <div className="relative inline-flex">
+                    <Badge variant="secondary" className="uppercase tracking-wide">
+                      Online
+                    </Badge>
+                    {dadosFinanceirosCount > 0 ? (
+                      <span
+                        className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                        aria-label={`Quantidade de registros Dados Financeiros: ${dadosFinanceirosCount}`}
+                      >
+                        {dadosFinanceirosCount}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -2555,9 +2620,19 @@ Todos os direitos reservados.`;
                     <Copy className="h-4 w-4" />
                   </Button>
 
-                  <Badge variant="secondary" className="uppercase tracking-wide">
-                    Online
-                  </Badge>
+                  <div className="relative inline-flex">
+                    <Badge variant="secondary" className="uppercase tracking-wide">
+                      Online
+                    </Badge>
+                    {dadosBasicosCount > 0 ? (
+                      <span
+                        className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                        aria-label={`Quantidade de registros Dados Básicos: ${dadosBasicosCount}`}
+                      >
+                        {dadosBasicosCount}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -2776,9 +2851,19 @@ Todos os direitos reservados.`;
                     <Copy className="h-4 w-4" />
                   </Button>
 
-                  <Badge variant="secondary" className="uppercase tracking-wide">
-                    Online
-                  </Badge>
+                  <div className="relative inline-flex">
+                    <Badge variant="secondary" className="uppercase tracking-wide">
+                      Online
+                    </Badge>
+                    {tituloEleitorCount > 0 ? (
+                      <span
+                        className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                        aria-label={`Quantidade de registros Título de Eleitor: ${tituloEleitorCount}`}
+                      >
+                        {tituloEleitorCount}
+                      </span>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </CardHeader>
@@ -2825,12 +2910,12 @@ Todos os direitos reservados.`;
 
           {/* Certidão de Nascimento */}
           <div id="certidao-nascimento-section">
-            <CertidaoNascimentoSection cpfId={result.id} />
+            <CertidaoNascimentoSection cpfId={result.id} onCountChange={setCertidaoNascimentoCount} />
           </div>
 
           {/* Documento */}
           <div id="documento-section">
-            <DocumentoSection cpfId={result.id} />
+            <DocumentoSection cpfId={result.id} onCountChange={setDocumentoCount} />
           </div>
 
           {/* CNS */}
