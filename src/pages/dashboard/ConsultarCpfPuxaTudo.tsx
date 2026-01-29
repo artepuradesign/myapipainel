@@ -2344,9 +2344,6 @@ Todos os direitos reservados.`;
                      Score
                    </CardTitle>
                    <div className="flex items-center gap-2">
-                     <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
-                       Online
-                     </Badge>
                      <Button
                        variant="ghost"
                        size="icon"
@@ -2363,6 +2360,10 @@ Todos os direitos reservados.`;
                      >
                        <Copy className="h-4 w-4" />
                      </Button>
+
+                      <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                        Online
+                      </Badge>
                    </div>
                  </div>
                </CardHeader>
@@ -2382,9 +2383,6 @@ Todos os direitos reservados.`;
                      CSB8
                    </CardTitle>
                    <div className="flex items-center gap-2">
-                     <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
-                       Online
-                     </Badge>
                      <Button
                        variant="ghost"
                        size="icon"
@@ -2401,6 +2399,10 @@ Todos os direitos reservados.`;
                      >
                        <Copy className="h-4 w-4" />
                      </Button>
+
+                      <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                        Online
+                      </Badge>
                    </div>
                  </div>
                </CardHeader>
@@ -2417,9 +2419,6 @@ Todos os direitos reservados.`;
                      CSBA
                    </CardTitle>
                    <div className="flex items-center gap-2">
-                     <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
-                       Online
-                     </Badge>
                      <Button
                        variant="ghost"
                        size="icon"
@@ -2436,6 +2435,10 @@ Todos os direitos reservados.`;
                      >
                        <Copy className="h-4 w-4" />
                      </Button>
+
+                      <Badge variant="secondary" className="uppercase tracking-wide text-[10px]">
+                        Online
+                      </Badge>
                    </div>
                  </div>
                </CardHeader>
@@ -2454,10 +2457,6 @@ Todos os direitos reservados.`;
                   Dados Financeiros
                 </CardTitle>
                 <div className="flex items-center gap-2">
-                  <Badge variant="secondary" className="uppercase tracking-wide">
-                    Online
-                  </Badge>
-
                   <Button
                     variant="ghost"
                     size="icon"
@@ -2475,6 +2474,10 @@ Todos os direitos reservados.`;
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
+
+                  <Badge variant="secondary" className="uppercase tracking-wide">
+                    Online
+                  </Badge>
                 </div>
               </div>
             </CardHeader>
@@ -2523,10 +2526,6 @@ Todos os direitos reservados.`;
                   <span className="truncate">Dados Básicos</span>
                 </CardTitle>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <Badge variant="secondary" className="uppercase tracking-wide">
-                    Online
-                  </Badge>
-
                   <Button
                     variant="ghost"
                     size="icon"
@@ -2555,6 +2554,10 @@ Todos os direitos reservados.`;
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
+
+                  <Badge variant="secondary" className="uppercase tracking-wide">
+                    Online
+                  </Badge>
                 </div>
               </div>
             </CardHeader>
@@ -2755,9 +2758,6 @@ Todos os direitos reservados.`;
                   Título de Eleitor
                 </CardTitle>
                 <div className="flex items-center gap-2 flex-shrink-0">
-                  <Badge variant="secondary" className="uppercase tracking-wide">
-                    Online
-                  </Badge>
                   <Button
                     variant="ghost"
                     size="icon"
@@ -2775,6 +2775,10 @@ Todos os direitos reservados.`;
                   >
                     <Copy className="h-4 w-4" />
                   </Button>
+
+                  <Badge variant="secondary" className="uppercase tracking-wide">
+                    Online
+                  </Badge>
                 </div>
               </div>
             </CardHeader>
