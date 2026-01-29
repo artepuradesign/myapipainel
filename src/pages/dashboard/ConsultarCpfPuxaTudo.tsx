@@ -79,21 +79,6 @@ import { atitoConsultaCpfService } from '@/services/atitoConsultaCpfService';
 import SectionActionButtons from '@/components/dashboard/SectionActionButtons';
 import PisSection from '@/components/dashboard/PisSection';
 import ScrollToTop from '@/components/ui/scroll-to-top';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 // Função melhorada para consultar CPF e registrar com debug robusto
 const consultarCPFComRegistro = async (cpf: string, cost: number, metadata: any) => {
@@ -729,57 +714,44 @@ const ConsultarCpfPuxaTudo = () => {
     };
   };
 
-  const [recentConsultationsPageSize, setRecentConsultationsPageSize] = useState<number>(5);
-  const [recentConsultationsPage, setRecentConsultationsPage] = useState(1);
-  const [recentConsultationsHasNext, setRecentConsultationsHasNext] = useState(false);
-
-  // Carregar últimas consultas CPF para exibir na seção (paginado no backend)
-  const loadRecentConsultations = async (page: number = 1, pageSize: number = recentConsultationsPageSize) => {
+  // Carregar últimas 5 consultas CPF para exibir na seção de histórico
+  const loadRecentConsultations = async () => {
     if (!user) return;
     
     try {
       setRecentConsultationsLoading(true);
-      console.log('📋 [RECENT_CONSULTATIONS] Carregando consultas CPF (paginado)...', {
-        page,
-        limit: pageSize,
-      });
+      console.log('📋 [RECENT_CONSULTATIONS] Carregando últimas 5 consultas CPF...');
       
-      // IMPORTANTE: usar o endpoint específico de histórico CPF (evita páginas "vazias" ao filtrar
-      // module_type após paginar em um histórico misto de módulos).
-      const response = await consultasCpfHistoryService.getHistory(page, pageSize);
-
-      const payload = response.success ? response.data : undefined;
-      const list = payload?.data;
-
-      if (response.success && payload && Array.isArray(list)) {
-        const cpfConsultations = list.map((consultation: any) => ({
-          id: `consultation-${consultation.id}`,
-          type: 'consultation',
-          module_type: 'cpf',
-          document: consultation.document,
-          cost: consultation.cost,
-          amount: -Math.abs(Number(consultation.cost) || 0),
-          status: consultation.status,
-          created_at: consultation.created_at,
-          updated_at: consultation.updated_at,
-          description: `Consulta CPF ${(consultation.document || '').replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}`,
-          result_data: consultation.result_data,
-        }));
-
+      // Usar o endpoint do consultationApiService para manter consistência com /dashboard/historico
+      const response = await consultationApiService.getConsultationHistory(5, 0);
+      
+      if (response.success && response.data && Array.isArray(response.data)) {
+        // Filtrar apenas consultas CPF e formatar para o ConsultationsSection
+        const cpfConsultations = response.data
+          .filter(item => item.module_type === 'cpf')
+          .map((consultation: any) => ({
+            id: `consultation-${consultation.id}`,
+            type: 'consultation',
+            module_type: 'cpf',
+            document: consultation.document,
+            cost: consultation.cost,
+            amount: -Math.abs(consultation.cost),
+            status: consultation.status,
+            created_at: consultation.created_at,
+            updated_at: consultation.updated_at,
+            description: `Consulta CPF ${consultation.document.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}`,
+            result_data: consultation.result_data
+          }));
+        
         setRecentConsultations(cpfConsultations);
-        setRecentConsultationsPage(page);
-        setRecentConsultationsHasNext(Boolean(payload.pagination?.has_next));
         console.log('✅ [RECENT_CONSULTATIONS] Últimas consultas carregadas:', cpfConsultations.length);
       } else {
         console.warn('⚠️ [RECENT_CONSULTATIONS] Nenhuma consulta encontrada');
         setRecentConsultations([]);
-        setRecentConsultationsPage(1);
-        setRecentConsultationsHasNext(false);
       }
     } catch (error) {
       console.error('❌ [RECENT_CONSULTATIONS] Erro ao carregar consultas:', error);
       setRecentConsultations([]);
-      setRecentConsultationsHasNext(false);
     } finally {
       setRecentConsultationsLoading(false);
     }
@@ -794,9 +766,9 @@ const ConsultarCpfPuxaTudo = () => {
       loadModulePrice(); // Carregar preço do módulo ID 83
       
       // Carregar dados em paralelo
-        Promise.all([
+      Promise.all([
         loadConsultationHistory(), // Carregar histórico do banco
-          loadRecentConsultations(1), // Carregar últimas consultas (paginado) para exibir na seção
+        loadRecentConsultations(), // Carregar últimas 5 consultas para exibir na seção
         loadStats() // Carregar estatísticas via API externa
       ]).then(() => {
         console.log('✅ [INIT] Todos os dados foram carregados');
@@ -3055,33 +3027,10 @@ Todos os direitos reservados.`;
               <FileText className={`mr-2 flex-shrink-0 ${isMobile ? 'h-4 w-4' : 'h-4 w-4 sm:h-5 sm:w-5'}`} />
               <span className="truncate">Últimas Consultas</span>
             </CardTitle>
-
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground whitespace-nowrap">Exibir</span>
-              <Select
-                value={String(recentConsultationsPageSize)}
-                onValueChange={(v) => {
-                  const nextSize = Number(v);
-                  setRecentConsultationsPageSize(nextSize);
-                  // resetar paginação ao mudar o tamanho da página
-                  loadRecentConsultations(1, nextSize);
-                }}
-              >
-                <SelectTrigger className="h-9 w-[92px]">
-                  <SelectValue placeholder="5" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="5">5</SelectItem>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="25">25</SelectItem>
-                </SelectContent>
-              </Select>
-              <span className="text-sm text-muted-foreground whitespace-nowrap">por página</span>
-            </div>
           </div>
         </CardHeader>
         <CardContent>
-           {recentConsultationsLoading ? (
+          {recentConsultationsLoading ? (
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
               <span className="ml-3 text-muted-foreground">Carregando consultas...</span>
@@ -3226,71 +3175,33 @@ Todos os direitos reservados.`;
                     </TableBody>
                   </Table>
                 );
-               })()}
-
-               {/* Paginação */}
-               <div className="mt-4 border-t border-border pt-3">
-                 <Pagination>
-                   <PaginationContent>
-                     <PaginationItem>
-                       <PaginationPrevious
-                         href="#"
-                         onClick={(e) => {
-                           e.preventDefault();
-                           if (recentConsultationsLoading) return;
-                           if (recentConsultationsPage <= 1) return;
-                            loadRecentConsultations(recentConsultationsPage - 1);
-                         }}
-                         aria-disabled={recentConsultationsPage <= 1 || recentConsultationsLoading}
-                         className={
-                           recentConsultationsPage <= 1 || recentConsultationsLoading
-                             ? 'pointer-events-none opacity-50'
-                             : undefined
-                         }
-                       />
-                     </PaginationItem>
-
-                     <PaginationItem>
-                       <PaginationLink
-                         href="#"
-                         isActive
-                         size="default"
-                         onClick={(e) => e.preventDefault()}
-                       >
-                         Página {recentConsultationsPage}
-                       </PaginationLink>
-                     </PaginationItem>
-
-                     <PaginationItem>
-                       <PaginationNext
-                         href="#"
-                         onClick={(e) => {
-                           e.preventDefault();
-                           if (recentConsultationsLoading) return;
-                           if (!recentConsultationsHasNext) return;
-                            loadRecentConsultations(recentConsultationsPage + 1);
-                         }}
-                         aria-disabled={!recentConsultationsHasNext || recentConsultationsLoading}
-                         className={
-                           !recentConsultationsHasNext || recentConsultationsLoading
-                             ? 'pointer-events-none opacity-50'
-                             : undefined
-                         }
-                       />
-                     </PaginationItem>
-                   </PaginationContent>
-                 </Pagination>
-               </div>
+              })()}
             </>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+              <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
                 Nenhuma consulta encontrada
               </h3>
               <p className="text-sm">
                 Suas consultas realizadas aparecerão aqui
               </p>
+            </div>
+          )}
+          
+          {recentConsultations.length > 0 && (
+            <div className="text-center pt-4 mt-4 border-t border-border">
+              <Button 
+                variant="outline" 
+                size={isMobile ? "sm" : "sm"}
+                onClick={() => navigate('/dashboard/historico-consultas-cpf')}
+                className="text-primary border-primary hover:bg-muted"
+              >
+                <FileText className={`mr-2 ${isMobile ? 'h-3 w-3' : 'h-4 w-4'}`} />
+                <span className={isMobile ? 'text-xs' : 'text-sm'}>
+                  Ver Histórico Completo
+                </span>
+              </Button>
             </div>
           )}
         </CardContent>
