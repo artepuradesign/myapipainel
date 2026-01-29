@@ -12,6 +12,7 @@ import type { BaseCertidao } from '@/services/baseCertidaoService';
 
 interface CertidaoNascimentoSectionProps {
   cpfId?: number;
+  onCountChange?: (count: number) => void;
 }
 
 const formatMaybeUpper = (v?: string | null) => {
@@ -37,7 +38,7 @@ const formatBrazilianDate = (value?: string | null) => {
   return value;
 };
 
-const CertidaoNascimentoSection: React.FC<CertidaoNascimentoSectionProps> = ({ cpfId }) => {
+const CertidaoNascimentoSection: React.FC<CertidaoNascimentoSectionProps> = ({ cpfId, onCountChange }) => {
   const { isLoading, getCertidaoByCpfId } = useBaseCertidao();
   const [certidao, setCertidao] = useState<BaseCertidao | null>(null);
 
@@ -61,6 +62,10 @@ const CertidaoNascimentoSection: React.FC<CertidaoNascimentoSectionProps> = ({ c
         certidao.data_emissao
     );
   }, [certidao]);
+
+  useEffect(() => {
+    onCountChange?.(hasData ? 1 : 0);
+  }, [hasData, onCountChange]);
 
   const sectionCardClass = hasData ? 'border-success-border bg-success-subtle' : undefined;
 
@@ -120,10 +125,6 @@ const CertidaoNascimentoSection: React.FC<CertidaoNascimentoSectionProps> = ({ c
           </CardTitle>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            <Badge variant="secondary" className="uppercase tracking-wide">
-              Online
-            </Badge>
-
             {hasData ? (
               <Button
                 variant="ghost"
@@ -135,6 +136,20 @@ const CertidaoNascimentoSection: React.FC<CertidaoNascimentoSectionProps> = ({ c
                 <Copy className="h-4 w-4" />
               </Button>
             ) : null}
+
+            <div className="relative inline-flex">
+              <Badge variant="secondary" className="uppercase tracking-wide">
+                Online
+              </Badge>
+              {hasData ? (
+                <span
+                  className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                  aria-label="Quantidade de registros Certidão de Nascimento: 1"
+                >
+                  1
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
       </CardHeader>

@@ -12,6 +12,7 @@
  
  interface DocumentoSectionProps {
    cpfId?: number;
+  onCountChange?: (count: number) => void;
  }
  
  const formatMaybeUpper = (v?: string | null) => {
@@ -37,7 +38,7 @@
    return value;
  };
  
- const DocumentoSection: React.FC<DocumentoSectionProps> = ({ cpfId }) => {
+const DocumentoSection: React.FC<DocumentoSectionProps> = ({ cpfId, onCountChange }) => {
    const { isLoading, getDocumentoByCpfId } = useBaseDocumento();
    const [documento, setDocumento] = useState<BaseDocumento | null>(null);
  
@@ -59,6 +60,10 @@
          documento.sigla_uf
      );
    }, [documento]);
+
+  useEffect(() => {
+    onCountChange?.(hasData ? 1 : 0);
+  }, [hasData, onCountChange]);
  
    const sectionCardClass = hasData ? 'border-success-border bg-success-subtle' : undefined;
  
@@ -123,9 +128,19 @@
                </Button>
              ) : null}
 
-              <Badge variant="secondary" className="uppercase tracking-wide">
-                Online
-              </Badge>
+              <div className="relative inline-flex">
+                <Badge variant="secondary" className="uppercase tracking-wide">
+                  Online
+                </Badge>
+                {hasData ? (
+                  <span
+                    className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                    aria-label="Quantidade de registros Documento: 1"
+                  >
+                    1
+                  </span>
+                ) : null}
+              </div>
            </div>
          </div>
        </CardHeader>
