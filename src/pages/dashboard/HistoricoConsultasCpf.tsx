@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -8,7 +8,6 @@ import { ArrowLeft, FileText, RefreshCw } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { consultasCpfHistoryService, type ConsultaCpfHistoryItem } from '@/services/consultasCpfHistoryService';
 import { consultationsService } from '@/services/consultationsService';
-import { useApiModules } from '@/hooks/useApiModules';
 import { toast } from 'sonner';
 
 const formatCPF = (cpf: string) => {
@@ -36,35 +35,9 @@ const formatCurrency = (value: number) =>
 const HistoricoConsultasCpf: React.FC = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { modules } = useApiModules();
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<ConsultaCpfHistoryItem[]>([]);
   const [openingId, setOpeningId] = useState<number | null>(null);
-
-  const modulesById = useMemo(() => {
-    const map = new Map<number, any>();
-    (modules || []).forEach((m: any) => {
-      if (typeof m?.id === 'number') map.set(m.id, m);
-    });
-    return map;
-  }, [modules]);
-
-  const getModuleLabel = (item: ConsultaCpfHistoryItem): string => {
-    const meta = (item as any)?.metadata;
-    const moduleId = meta?.module_id;
-    if (typeof moduleId === 'number') {
-      const mod = modulesById.get(moduleId);
-      const label = (mod?.title || mod?.name || '').toString().trim();
-      if (label) return label;
-    }
-
-    const source = (meta?.source || '').toString().toLowerCase();
-    if (source.includes('consultar-cpf-simples')) return 'Consultar CPF (Simples)';
-    if (source.includes('consultar-cpf-puxa-tudo')) return 'Consultar CPF (Puxa Tudo)';
-    if (source.includes('consultar-cpf')) return 'Consultar CPF';
-
-    return 'CPF';
-  };
 
   const load = async () => {
     setLoading(true);
@@ -160,7 +133,6 @@ const HistoricoConsultasCpf: React.FC = () => {
             <div className="space-y-2">
               {items.map((item) => {
                 const isOpening = openingId === item.id;
-                const moduleLabel = getModuleLabel(item);
 
                 return (
                   <button
@@ -185,9 +157,6 @@ const HistoricoConsultasCpf: React.FC = () => {
                           <div className="font-mono text-xs truncate">{formatCPF(item.document)}</div>
                         </div>
                         <div className="text-xs text-muted-foreground mt-1">{formatFullDate(item.created_at)}</div>
-                        <div className="text-[11px] text-muted-foreground mt-1 truncate" title={moduleLabel}>
-                          {moduleLabel}
-                        </div>
                       </div>
 
                       {isOpening ? (
@@ -209,7 +178,6 @@ const HistoricoConsultasCpf: React.FC = () => {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-52 whitespace-nowrap">CPF</TableHead>
-                  <TableHead className="whitespace-nowrap">Módulo</TableHead>
                   <TableHead className="whitespace-nowrap">Data e Hora</TableHead>
                   <TableHead className="w-32 text-right whitespace-nowrap">Valor</TableHead>
                   <TableHead className="w-28 text-center whitespace-nowrap">Status</TableHead>
@@ -223,9 +191,6 @@ const HistoricoConsultasCpf: React.FC = () => {
                     onClick={() => openConsultation(item)}
                   >
                     <TableCell className="font-mono text-sm whitespace-nowrap">{formatCPF(item.document)}</TableCell>
-                    <TableCell className="text-sm max-w-[320px] truncate" title={getModuleLabel(item)}>
-                      {getModuleLabel(item)}
-                    </TableCell>
                     <TableCell className="text-sm whitespace-nowrap">{formatFullDate(item.created_at)}</TableCell>
                     <TableCell className="text-right text-sm font-medium text-destructive whitespace-nowrap">
                       {formatCurrency(Number(item.cost) || 0)}

@@ -82,12 +82,7 @@ import ScrollToTop from '@/components/ui/scroll-to-top';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 
 // Função melhorada para consultar CPF e registrar com debug robusto
-const consultarCPFComRegistro = async (
-  cpf: string,
-  cost: number,
-  metadata: any,
-  moduleTypeLabel: string = 'Consulta CPF'
-) => {
+const consultarCPFComRegistro = async (cpf: string, cost: number, metadata: any) => {
   console.log('🔍 [CPF_CONSULTA] INÍCIO - Consultando CPF:', cpf);
   console.log('💰 [CPF_CONSULTA] Custo da consulta (VALOR COM DESCONTO):', cost);
   console.log('🔑 [CPF_CONSULTA] Metadata enviado:', metadata);
@@ -170,7 +165,7 @@ const consultarCPFComRegistro = async (
         
         const registroPayload = {
           user_id: parseInt(metadata.user_id.toString()),
-          module_type: moduleTypeLabel,
+          module_type: 'cpf',
           document: cpf,  // Backend PHP espera 'document', não 'documento'
           cost: finalCost, // VALOR COM DESCONTO JÁ APLICADO (preço do módulo ID 83 com desconto)
           status: 'completed',
@@ -315,7 +310,7 @@ const consultarCPFComRegistro = async (
         
         const registroPayload = {
           user_id: parseInt(metadata.user_id.toString()),
-          module_type: moduleTypeLabel,
+          module_type: 'cpf',
           document: cpf,
           cost: finalCost,
           status: 'completed',
@@ -391,7 +386,7 @@ const consultarCPFComRegistro = async (
             
             const registroPayload = {
               user_id: parseInt(metadata.user_id.toString()),
-              module_type: moduleTypeLabel,
+              module_type: 'cpf',
               document: cpf,
               cost: finalCost,
               status: 'completed',
@@ -734,14 +729,11 @@ const ConsultarCpfPuxaTudo = () => {
       if (response.success && response.data && Array.isArray(response.data)) {
         // Filtrar apenas consultas CPF e formatar para o ConsultationsSection
         const cpfConsultations = response.data
-          .filter((item) => {
-            const mt = (item?.module_type || '').toString().toLowerCase();
-            return mt === 'cpf' || mt.includes('cpf');
-          })
+          .filter(item => item.module_type === 'cpf')
           .map((consultation: any) => ({
             id: `consultation-${consultation.id}`,
             type: 'consultation',
-            module_type: consultation.module_type,
+            module_type: 'cpf',
             document: consultation.document,
             cost: consultation.cost,
             amount: -Math.abs(consultation.cost),
@@ -1425,8 +1417,6 @@ const ConsultarCpfPuxaTudo = () => {
         subscriptionPlan: subscription?.plan_name,
         userPlan
       });
-
-      const moduleTypeLabel = 'Consultar CPF (Puxa Tudo)';
       
       const baseCpfResult = await consultarCPFComRegistro(cpf, finalPrice, {
         discount: discount,
@@ -1439,7 +1429,7 @@ const ConsultarCpfPuxaTudo = () => {
         session_token: sessionToken,
         plan_balance: planBalance,
         wallet_balance: walletBalance
-      }, moduleTypeLabel);
+      });
       
       console.log('📊 [HANDLE_SEARCH] Resultado da consulta:', {
         success: baseCpfResult.success,

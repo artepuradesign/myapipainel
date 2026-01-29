@@ -92,10 +92,7 @@ export const consultasCpfService = {
     
     // Filtrar apenas consultas de CPF se necessário
     if (response.success && Array.isArray(response.data)) {
-      const cpfConsultations = response.data.filter((c: any) => {
-        const mt = (c?.module_type || '').toString().toLowerCase();
-        return mt === 'cpf' || mt.includes('cpf');
-      });
+      const cpfConsultations = response.data.filter((c: any) => c.module_type === 'cpf');
       return {
         ...response,
         data: cpfConsultations
